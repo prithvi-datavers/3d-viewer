@@ -186,7 +186,7 @@ function createCompassAxis(
   labelPlane.billboardMode = 7
 
   const tex = new DynamicTexture(`compassLabelTex_${label}`, { width: 64, height: 64 }, scene, false)
-  const ctx = tex.getContext()
+  const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
   ctx.clearRect(0, 0, 64, 64)
   ctx.fillStyle = hexColor
   ctx.font = 'bold 40px Arial'
@@ -226,7 +226,7 @@ function createAxisStub(scene: Scene, from: Vector3, to: Vector3, hexColor: stri
   labelPlane.billboardMode = 7
 
   const tex = new DynamicTexture(`axisStubLabelTex_${label}`, { width: 64, height: 64 }, scene, false)
-  const ctx = tex.getContext()
+  const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
   ctx.clearRect(0, 0, 64, 64)
   ctx.fillStyle = hexColor
   ctx.font = 'bold 40px Arial'
