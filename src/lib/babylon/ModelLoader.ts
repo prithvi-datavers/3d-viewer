@@ -1,12 +1,21 @@
 import type { Scene, AbstractMesh } from '@babylonjs/core'
 import { SceneLoader, MeshBuilder, PBRMaterial, Color3, Vector3 } from '@babylonjs/core'
+import { loadSTEP, type StepProgressCallback } from './StepLoader'
 
-export async function loadFile(file: File, scene: Scene): Promise<AbstractMesh[]> {
+export async function loadFile(
+  file: File,
+  scene: Scene,
+  onProgress?: StepProgressCallback
+): Promise<AbstractMesh[]> {
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
+
+  if (ext === 'stp' || ext === 'step') {
+    return loadSTEP(file, scene, onProgress)
+  }
+
   const url = URL.createObjectURL(file)
-  const ext = '.' + file.name.split('.').pop()?.toLowerCase()
-
   try {
-    const result = await SceneLoader.ImportMeshAsync('', '', url, scene, null, ext)
+    const result = await SceneLoader.ImportMeshAsync('', '', url, scene, null, '.' + ext)
     return result.meshes.filter((m) => m.getTotalVertices() > 0)
   } finally {
     URL.revokeObjectURL(url)

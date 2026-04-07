@@ -5,7 +5,8 @@
       "Bash(echo \"EXIT:$?\")",
       "Bash(npx vite:*)",
       "Bash(npm run:*)",
-      "Bash(git -C /Users/prithvi/AES/3D-Viewer remote -v)"
+      "Bash(git -C /Users/prithvi/AES/3D-Viewer remote -v)",
+      "Bash(git -C /Users/prithvi/AES/3D-Viewer log --oneline -3)"
     ]
   }
 }

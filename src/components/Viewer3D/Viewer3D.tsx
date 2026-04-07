@@ -114,28 +114,30 @@ export default function Viewer3D() {
     setIsDragging(true)
   }
   const handleDragLeave = () => setIsDragging(false)
+  const [stepLoadingMsg, setStepLoadingMsg] = useState<string | null>(null)
+
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(false)
     const file = e.dataTransfer.files[0]
     if (!file || !sceneRef.current || !cameraInternalRef.current) return
     const ext = file.name.split('.').pop()?.toLowerCase()
-    if (!['glb', 'gltf'].includes(ext || '')) {
-      alert('Please drop a .glb or .gltf file')
+    if (!['glb', 'gltf', 'stp', 'step'].includes(ext || '')) {
+      alert('Please drop a .glb, .gltf, .stp, or .step file')
       return
     }
     try {
-      // Clear existing model meshes
       const toRemove = getModelMeshes(sceneRef.current)
       toRemove.forEach((m) => m.dispose())
-      const meshes = await loadFile(file, sceneRef.current)
+      const meshes = await loadFile(file, sceneRef.current, (msg) => setStepLoadingMsg(msg || null))
       setLoadedFileName(file.name)
-      // Apply current shading
       applyShadingMode(shadingMode, meshes)
       fitToScene(cameraInternalRef.current, sceneRef.current.meshes.slice())
     } catch (err) {
       console.error('Failed to load model:', err)
-      alert('Failed to load model. Make sure it is a valid GLTF/GLB file.')
+      alert('Failed to load model.')
+    } finally {
+      setStepLoadingMsg(null)
     }
   }
 
@@ -159,7 +161,12 @@ export default function Viewer3D() {
       <StatusBar loadedFileName={loadedFileName} />
 
       {isDragging && (
-        <div className="drop-overlay">Drop GLTF / GLB file here</div>
+        <div className="drop-overlay">Drop GLTF / GLB / STEP file here</div>
+      )}
+      {stepLoadingMsg && (
+        <div className="drop-overlay" style={{ pointerEvents: 'all', fontSize: 14 }}>
+          {stepLoadingMsg}
+        </div>
       )}
     </div>
   )
