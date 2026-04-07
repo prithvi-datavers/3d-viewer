@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Vector3, Matrix } from '@babylonjs/core'
+import { Vector3, Matrix, Viewport } from '@babylonjs/core'
 import { useViewerStore } from '../../store/viewerStore'
 
 interface ScreenPos {
@@ -28,6 +28,7 @@ export default function MeasurementLabels() {
       const vw = engine.getRenderWidth()
       const vh = engine.getRenderHeight()
       const transform = camera.getViewMatrix().multiply(camera.getProjectionMatrix())
+      const viewport = new Viewport(0, 0, vw, vh)
 
       const next: ScreenPos[] = []
       for (const m of measurements) {
@@ -36,7 +37,7 @@ export default function MeasurementLabels() {
           m.midpoint,
           Matrix.Identity(),
           transform,
-          { x: 0, y: 0, width: vw, height: vh }
+          viewport
         )
         if (projected.z < 0 || projected.z > 1) continue
         next.push({ id: m.id, x: projected.x, y: projected.y, display: m.display })
@@ -44,7 +45,7 @@ export default function MeasurementLabels() {
       setPositions(next)
     })
 
-    return () => scene.onBeforeRenderObservable.remove(observer)
+    return () => { scene.onBeforeRenderObservable.remove(observer) }
   }, [scene, measurements])
 
   return (

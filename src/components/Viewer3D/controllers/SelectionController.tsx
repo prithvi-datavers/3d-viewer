@@ -29,7 +29,7 @@ export default function SelectionController() {
       setSelection(mesh.name, selInfo)
     })
 
-    return () => scene.onPointerObservable.remove(observer)
+    return () => { scene.onPointerObservable.remove(observer) }
   }, [scene, measureMode, setSelection])
 
   return null

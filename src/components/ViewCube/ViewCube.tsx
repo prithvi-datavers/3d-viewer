@@ -79,7 +79,7 @@ export default function ViewCube() {
       plane.rotation = new Vector3(...def.rot)
 
       const tex = new DynamicTexture(`tex_${def.name}`, { width: 256, height: 256 }, scene, false)
-      const ctx = tex.getContext()
+      const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
       ctx.fillStyle = def.color
       ctx.fillRect(0, 0, 256, 256)
       ctx.fillStyle = '#ffffff'

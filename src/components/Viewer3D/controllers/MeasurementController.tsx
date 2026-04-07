@@ -53,7 +53,7 @@ export default function MeasurementController() {
       }
     })
 
-    return () => scene.onPointerObservable.remove(observer)
+    return () => { scene.onPointerObservable.remove(observer) }
   }, [scene, measureMode, addMeasurement])
 
   return null
