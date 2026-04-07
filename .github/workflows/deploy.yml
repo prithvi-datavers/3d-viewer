@@ -24,43 +24,21 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Lightsail
+      - name: Prepare server
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.LIGHTSAIL_IP }}
           username: ubuntu
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
-            # Install nginx if not present
             if ! command -v nginx &> /dev/null; then
               sudo apt-get update && sudo apt-get install -y nginx
             fi
-
-            # Ensure /var/www/html exists and ubuntu can write to it
             sudo mkdir -p /var/www/html
             sudo chown -R ubuntu:ubuntu /var/www/html
             sudo chmod -R 755 /var/www/html
-
-            # Clear old files
             rm -rf /var/www/html/*
-
-            # Write nginx config for SPA routing
-            sudo tee /etc/nginx/sites-available/default > /dev/null << 'NGINXCONF'
-server {
-    listen 80 default_server;
-    root /var/www/html;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    gzip on;
-    gzip_types text/plain text/css application/javascript application/json;
-    gzip_min_length 1000;
-}
-NGINXCONF
-
+            printf 'server {\n    listen 80 default_server;\n    root /var/www/html;\n    index index.html;\n    location / {\n        try_files $uri $uri/ /index.html;\n    }\n    gzip on;\n    gzip_types text/plain text/css application/javascript application/json;\n    gzip_min_length 1000;\n}\n' | sudo tee /etc/nginx/sites-available/default > /dev/null
             sudo nginx -t && sudo systemctl reload nginx
 
       - name: Upload dist to Lightsail
