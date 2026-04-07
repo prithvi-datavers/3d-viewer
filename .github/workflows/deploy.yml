@@ -36,25 +36,30 @@ jobs:
               sudo apt-get update && sudo apt-get install -y nginx
             fi
 
+            # Ensure /var/www/html exists and ubuntu can write to it
+            sudo mkdir -p /var/www/html
+            sudo chown -R ubuntu:ubuntu /var/www/html
+            sudo chmod -R 755 /var/www/html
+
             # Clear old files
-            sudo rm -rf /var/www/html/*
+            rm -rf /var/www/html/*
 
             # Write nginx config for SPA routing
             sudo tee /etc/nginx/sites-available/default > /dev/null << 'NGINXCONF'
-            server {
-                listen 80 default_server;
-                root /var/www/html;
-                index index.html;
+server {
+    listen 80 default_server;
+    root /var/www/html;
+    index index.html;
 
-                location / {
-                    try_files $uri $uri/ /index.html;
-                }
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
 
-                gzip on;
-                gzip_types text/plain text/css application/javascript application/json;
-                gzip_min_length 1000;
-            }
-            NGINXCONF
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json;
+    gzip_min_length 1000;
+}
+NGINXCONF
 
             sudo nginx -t && sudo systemctl reload nginx
 
