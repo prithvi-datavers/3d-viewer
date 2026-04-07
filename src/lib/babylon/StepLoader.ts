@@ -24,7 +24,7 @@ async function getOC(): Promise<any> {
   if (initPromise) return initPromise
 
   initPromise = (async () => {
-    const { initOpenCascade } = await import('opencascade.js')
+    const initOpenCascade = (await import('opencascade.js')).default
     const oc = await initOpenCascade()
     ocInstance = oc
     return oc
