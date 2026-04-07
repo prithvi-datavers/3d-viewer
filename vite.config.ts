@@ -1,8 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'path'
+import { resolve } from 'path'
+import { fileURLToPath } from 'url'
 
-const emptyStub = path.resolve(__dirname, 'src/utils/empty-stub.js')
+const __dirname = fileURLToPath(new URL('.', import.meta.url))
+const emptyStub = resolve(__dirname, 'src/utils/empty-stub.js')
 
 export default defineConfig({
   plugins: [react()],
@@ -12,7 +14,6 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // Stub Node.js builtins required by opencascade.js in browser
       fs: emptyStub,
       perf_hooks: emptyStub,
       os: emptyStub,
