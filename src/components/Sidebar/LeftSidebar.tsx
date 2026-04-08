@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { Upload, LayoutGrid, Ruler } from 'lucide-react'
 import { useViewerStore } from '../../store/viewerStore'
-import { loadFile, loadSampleGeometry } from '../../lib/babylon/ModelLoader'
+import { loadFile } from '../../lib/babylon/ModelLoader'
 import { applyShadingMode, getModelMeshes } from '../../lib/babylon/ShadingManager'
 import { fitToScene } from '../../lib/babylon/CameraManager'
 import type { ReactNode } from 'react'
@@ -19,37 +19,33 @@ interface Props {
 }
 
 export default function LeftSidebar({ activePanel, onSelect }: Props) {
-  const fileInputRef  = useRef<HTMLInputElement>(null)
-  const babylonScene  = useViewerStore((s) => s.babylonScene)
-  const cameraRef     = useViewerStore((s) => s.cameraRef)
-  const shadingMode   = useViewerStore((s) => s.shadingMode)
+  const fileInputRef    = useRef<HTMLInputElement>(null)
+  const babylonScene    = useViewerStore((s) => s.babylonScene)
+  const cameraRef       = useViewerStore((s) => s.cameraRef)
+  const shadingMode     = useViewerStore((s) => s.shadingMode)
+  const setLoadedFileName = useViewerStore((s) => s.setLoadedFileName)
+  const setLoadingMsg   = useViewerStore((s) => s.setLoadingMsg)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !babylonScene || !cameraRef) return
     getModelMeshes(babylonScene).forEach((m) => m.dispose())
     try {
-      const meshes = await loadFile(file, babylonScene)
+      const meshes = await loadFile(file, babylonScene, (msg) => setLoadingMsg(msg || null))
       applyShadingMode(shadingMode, meshes)
       fitToScene(cameraRef, babylonScene.meshes.slice())
+      setLoadedFileName(file.name)
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       alert(`Failed to load file:\n${msg}`)
+    } finally {
+      setLoadingMsg(null)
     }
     e.target.value = ''
   }
 
-  const handleSample = () => {
-    if (!babylonScene || !cameraRef) return
-    getModelMeshes(babylonScene).forEach((m) => m.dispose())
-    const meshes = loadSampleGeometry(babylonScene)
-    applyShadingMode(shadingMode, meshes)
-    fitToScene(cameraRef, babylonScene.meshes.slice())
-  }
-
   return (
     <div className="left-sidebar">
-      {/* Action buttons */}
       <div
         className="sidebar-item sidebar-action"
         onClick={() => fileInputRef.current?.click()}
@@ -64,14 +60,9 @@ export default function LeftSidebar({ activePanel, onSelect }: Props) {
         style={{ display: 'none' }}
         onChange={handleFileChange}
       />
-      <div className="sidebar-item sidebar-action" onClick={handleSample}>
-        <LayoutGrid size={18} strokeWidth={1.75} />
-        <span className="sidebar-item-label">Sample</span>
-      </div>
 
       <div className="sidebar-sep" />
 
-      {/* Panel nav items */}
       {PANEL_ITEMS.map(({ id, icon, label }) => (
         <div
           key={id}

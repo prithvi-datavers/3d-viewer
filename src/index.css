@@ -462,8 +462,8 @@ body {
   pointer-events: auto;
 }
 .viewcube-canvas-wrap {
-  width: 140px;
-  height: 140px;
+  width: 112px;
+  height: 112px;
   border-radius: 6px;
   overflow: hidden;
 }

@@ -33,6 +33,12 @@ interface ViewerStore {
   selectedMeshName: string | null
   selectionInfo: SelectionInfo | null
   setSelection: (name: string | null, info: SelectionInfo | null) => void
+
+  // File loading status
+  loadedFileName: string | null
+  loadingMsg: string | null
+  setLoadedFileName: (name: string | null) => void
+  setLoadingMsg: (msg: string | null) => void
 }
 
 export const useViewerStore = create<ViewerStore>((set) => ({
@@ -66,4 +72,10 @@ export const useViewerStore = create<ViewerStore>((set) => ({
   selectedMeshName: null,
   selectionInfo: null,
   setSelection: (selectedMeshName, selectionInfo) => set({ selectedMeshName, selectionInfo }),
+
+  // File loading status
+  loadedFileName: null,
+  loadingMsg: null,
+  setLoadedFileName: (loadedFileName) => set({ loadedFileName }),
+  setLoadingMsg: (loadingMsg) => set({ loadingMsg }),
 }))

@@ -55,6 +55,9 @@ export default function TopToolbar() {
       <button className="pill-btn" title="Fit to Scene (F)" onClick={handleFit}>
         <Maximize2 size={15} strokeWidth={1.75} />
       </button>
+      <div className="pill-sep" />
+
+      {/* Shading modes */}
       <button
         className={`pill-btn${shadingMode === 'shaded' ? ' active' : ''}`}
         title="Solid"
@@ -76,6 +79,9 @@ export default function TopToolbar() {
       >
         <Square size={15} strokeWidth={2.5} />
       </button>
+
+      <div className="pill-sep" />
+
       <button
         className={`pill-btn${gridVisible ? ' active' : ''}`}
         title="Toggle Grid (G)"
