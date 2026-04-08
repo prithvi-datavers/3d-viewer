@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import Viewer3D from './components/Viewer3D/Viewer3D'
 import TopBar from './components/TopBar/TopBar'
-import LeftSidebar from './components/Sidebar/LeftSidebar'
-import RightPanel from './components/Sidebar/RightPanel'
 import type { SidebarPanel } from './components/Sidebar/LeftSidebar'
 import { useViewerStore } from './store/viewerStore'
 import { fitToScene } from './lib/babylon/CameraManager'
@@ -55,11 +53,7 @@ export default function App() {
   return (
     <div className="app-layout">
       <TopBar />
-      <div className="app-body">
-        <LeftSidebar activePanel={activePanel} onSelect={setActivePanel} />
-        <Viewer3D />
-        <RightPanel activePanel={activePanel} />
-      </div>
+      <Viewer3D activePanel={activePanel} onPanelSelect={setActivePanel} />
     </div>
   )
 }

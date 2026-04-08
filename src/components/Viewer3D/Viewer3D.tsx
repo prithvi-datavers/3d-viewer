@@ -12,8 +12,16 @@ import SelectionController from './controllers/SelectionController'
 import MeasurementController from './controllers/MeasurementController'
 import StatusBar from '../StatusBar/StatusBar'
 import TopToolbar from '../Toolbar/TopToolbar'
+import LeftSidebar from '../Sidebar/LeftSidebar'
+import RightPanel from '../Sidebar/RightPanel'
+import type { SidebarPanel } from '../Sidebar/LeftSidebar'
 
-export default function Viewer3D() {
+interface Props {
+  activePanel: SidebarPanel | null
+  onPanelSelect: (p: SidebarPanel | null) => void
+}
+
+export default function Viewer3D({ activePanel, onPanelSelect }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [loadedFileName, setLoadedFileName] = useState<string | null>(null)
@@ -156,6 +164,10 @@ export default function Viewer3D() {
       <ShadingController />
       <SelectionController />
       <MeasurementController />
+
+      {/* Floating sidebar + panel */}
+      <LeftSidebar activePanel={activePanel} onSelect={onPanelSelect} />
+      <RightPanel activePanel={activePanel} />
 
       {/* Overlays */}
       <TopToolbar />
