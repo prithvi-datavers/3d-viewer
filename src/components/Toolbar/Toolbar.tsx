@@ -1,113 +1,116 @@
-import {
-  Box, Circle, Grid3X3, Ruler, Eye, Layers,
-  Move, RotateCcw, ZoomIn,
-} from 'lucide-react'
+import { Box, Layers, Grid3X3, Ruler, Eye, Maximize2 } from 'lucide-react'
 import { useViewerStore } from '../../store/viewerStore'
 import type { ShadingMode, ViewPreset } from '../../types/viewer'
-import { animateToView } from '../../lib/babylon/CameraManager'
-import { fitToScene } from '../../lib/babylon/CameraManager'
+import { animateToView, fitToScene } from '../../lib/babylon/CameraManager'
+import { ViewCubeIcon } from './ViewIcons'
 
-const SHADING_MODES: { mode: ShadingMode; label: string; title: string }[] = [
-  { mode: 'shaded',      label: 'S',  title: 'Solid / Shaded' },
-  { mode: 'wireframe',   label: 'W',  title: 'Wireframe' },
-  { mode: 'shadedEdges', label: 'SE', title: 'Solid + Edges' },
-]
-
-const VIEW_PRESETS: { id: ViewPreset; label: string }[] = [
-  { id: 'FRONT',  label: 'F' },
-  { id: 'BACK',   label: 'Bk' },
-  { id: 'RIGHT',  label: 'R' },
-  { id: 'LEFT',   label: 'L' },
-  { id: 'TOP',    label: 'T' },
-  { id: 'BOTTOM', label: 'Bo' },
-  { id: 'ISO',    label: '⧦' },
+const VIEW_PRESETS: { id: ViewPreset; face: Parameters<typeof ViewCubeIcon>[0]['face']; label: string }[] = [
+  { id: 'FRONT',  face: 'front',  label: 'Front'  },
+  { id: 'BACK',   face: 'back',   label: 'Back'   },
+  { id: 'RIGHT',  face: 'right',  label: 'Right'  },
+  { id: 'LEFT',   face: 'left',   label: 'Left'   },
+  { id: 'TOP',    face: 'top',    label: 'Top'    },
+  { id: 'BOTTOM', face: 'bottom', label: 'Bottom' },
+  { id: 'ISO',    face: 'iso',    label: 'ISO'    },
 ]
 
 export default function Toolbar() {
-  const shadingMode = useViewerStore((s) => s.shadingMode)
+  const shadingMode   = useViewerStore((s) => s.shadingMode)
   const setShadingMode = useViewerStore((s) => s.setShadingMode)
-  const cameraMode = useViewerStore((s) => s.cameraMode)
-  const setCameraMode = useViewerStore((s) => s.setCameraMode)
-  const gridVisible = useViewerStore((s) => s.gridVisible)
-  const toggleGrid = useViewerStore((s) => s.toggleGrid)
-  const measureMode = useViewerStore((s) => s.measureMode)
+  const cameraMode    = useViewerStore((s) => s.cameraMode)
+  const setCameraMode  = useViewerStore((s) => s.setCameraMode)
+  const gridVisible   = useViewerStore((s) => s.gridVisible)
+  const toggleGrid    = useViewerStore((s) => s.toggleGrid)
+  const measureMode   = useViewerStore((s) => s.measureMode)
   const toggleMeasureMode = useViewerStore((s) => s.toggleMeasureMode)
-  const babylonScene = useViewerStore((s) => s.babylonScene)
-  const cameraRef = useViewerStore((s) => s.cameraRef)
+  const babylonScene  = useViewerStore((s) => s.babylonScene)
+  const cameraRef     = useViewerStore((s) => s.cameraRef)
 
   const handleFit = () => {
-    if (babylonScene && cameraRef) {
-      fitToScene(cameraRef, babylonScene.meshes.slice())
-    }
+    if (babylonScene && cameraRef) fitToScene(cameraRef, babylonScene.meshes.slice())
   }
-
-  const toggleCamMode = () => {
+  const toggleCam = () => {
     setCameraMode(cameraMode === 'perspective' ? 'orthographic' : 'perspective')
   }
 
   return (
-    <div className="toolbar">
-      {/* Display modes */}
-      <span className="toolbar-group-label">VIEW</span>
-      {SHADING_MODES.map(({ mode, label, title }) => (
+    <>
+      {/* ── Left floating panel ─────────────────────────────── */}
+      <div className="fp fp-left">
+
+        {/* Display modes */}
         <button
-          key={mode}
-          className={`tool-btn${shadingMode === mode ? ' active' : ''}`}
-          title={title}
-          onClick={() => setShadingMode(mode)}
+          className={`fp-btn${shadingMode === 'shaded' ? ' active' : ''}`}
+          title="Solid"
+          onClick={() => setShadingMode('shaded')}
         >
-          <span className="tool-btn-text">{label}</span>
+          <Box size={14} />
         </button>
-      ))}
-
-      <div className="toolbar-sep-h" />
-
-      {/* Camera */}
-      <span className="toolbar-group-label">CAM</span>
-      <button
-        className={`tool-btn${cameraMode === 'orthographic' ? ' active' : ''}`}
-        title={cameraMode === 'perspective' ? 'Switch to Orthographic' : 'Switch to Perspective'}
-        onClick={toggleCamMode}
-      >
-        <Eye size={15} />
-      </button>
-      <button className="tool-btn" title="Fit to Scene (F)" onClick={handleFit}>
-        <ZoomIn size={15} />
-      </button>
-
-      <div className="toolbar-sep-h" />
-
-      {/* View presets */}
-      <span className="toolbar-group-label">VIEWS</span>
-      {VIEW_PRESETS.map(({ id, label }) => (
         <button
-          key={id}
-          className="tool-btn"
-          title={`${id.charAt(0) + id.slice(1).toLowerCase()} View`}
-          onClick={() => animateToView(id)}
+          className={`fp-btn${shadingMode === 'wireframe' ? ' active' : ''}`}
+          title="Wireframe"
+          onClick={() => setShadingMode('wireframe')}
         >
-          <span className="tool-btn-text">{label}</span>
+          <Layers size={14} />
         </button>
-      ))}
+        <button
+          className={`fp-btn${shadingMode === 'shadedEdges' ? ' active' : ''}`}
+          title="Solid + Edges"
+          onClick={() => setShadingMode('shadedEdges')}
+        >
+          <Grid3X3 size={14} />
+        </button>
 
-      <div className="toolbar-sep-h" />
+        <div className="fp-sep" />
 
-      {/* Tools */}
-      <span className="toolbar-group-label">TOOLS</span>
-      <button
-        className={`tool-btn${gridVisible ? ' active' : ''}`}
-        title="Toggle Grid (G)"
-        onClick={toggleGrid}
-      >
-        <Grid3X3 size={15} />
-      </button>
-      <button
-        className={`tool-btn${measureMode ? ' active' : ''}`}
-        title="Measure Distance (M)"
-        onClick={toggleMeasureMode}
-      >
-        <Ruler size={15} />
-      </button>
-    </div>
+        {/* Camera & scene tools */}
+        <button
+          className={`fp-btn${cameraMode === 'orthographic' ? ' active' : ''}`}
+          title={cameraMode === 'perspective' ? 'Orthographic (P)' : 'Perspective (P)'}
+          onClick={toggleCam}
+        >
+          <Eye size={14} />
+        </button>
+        <button
+          className="fp-btn"
+          title="Fit to Scene (F)"
+          onClick={handleFit}
+        >
+          <Maximize2 size={14} />
+        </button>
+
+        <div className="fp-sep" />
+
+        {/* Misc tools */}
+        <button
+          className={`fp-btn${gridVisible ? ' active' : ''}`}
+          title="Toggle Grid (G)"
+          onClick={toggleGrid}
+        >
+          <Grid3X3 size={14} strokeWidth={1.25} />
+        </button>
+        <button
+          className={`fp-btn${measureMode ? ' active' : ''}`}
+          title="Measure Distance (M)"
+          onClick={toggleMeasureMode}
+        >
+          <Ruler size={14} />
+        </button>
+      </div>
+
+      {/* ── Bottom view-preset panel ─────────────────────────── */}
+      <div className="fp fp-views">
+        {VIEW_PRESETS.map(({ id, face, label }) => (
+          <button
+            key={id}
+            className="fp-view-btn"
+            onClick={() => animateToView(id)}
+          >
+            <ViewCubeIcon face={face} size={18} />
+            <span className="fp-view-label">{label}</span>
+          </button>
+        ))}
+      </div>
+    </>
   )
 }

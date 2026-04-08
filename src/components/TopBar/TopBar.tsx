@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Upload, Maximize2 } from 'lucide-react'
+import { Upload, LayoutGrid } from 'lucide-react'
 import { useViewerStore } from '../../store/viewerStore'
 import { loadFile, loadSampleGeometry } from '../../lib/babylon/ModelLoader'
 import { applyShadingMode, getModelMeshes } from '../../lib/babylon/ShadingManager'
@@ -10,10 +10,10 @@ interface Props {
 }
 
 export default function TopBar({ onFileLoaded }: Props) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const babylonScene = useViewerStore((s) => s.babylonScene)
-  const cameraRef = useViewerStore((s) => s.cameraRef)
-  const shadingMode = useViewerStore((s) => s.shadingMode)
+  const fileInputRef  = useRef<HTMLInputElement>(null)
+  const babylonScene  = useViewerStore((s) => s.babylonScene)
+  const cameraRef     = useViewerStore((s) => s.cameraRef)
+  const shadingMode   = useViewerStore((s) => s.shadingMode)
   const [loadingMsg, setLoadingMsg] = useState<string | null>(null)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,11 +47,19 @@ export default function TopBar({ onFileLoaded }: Props) {
 
   return (
     <div className="topbar">
-      <span className="topbar-title">3D Viewer</span>
+      <div className="topbar-brand">
+        <span className="topbar-dot" />
+        <span className="topbar-title">3D Viewer</span>
+      </div>
+
       <div className="topbar-sep" />
 
-      <button className="topbar-btn" onClick={() => fileInputRef.current?.click()} disabled={!!loadingMsg}>
-        <Upload size={13} />
+      <button
+        className="topbar-btn"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={!!loadingMsg}
+      >
+        <Upload size={12} />
         Load Model
       </button>
       <input
@@ -62,20 +70,21 @@ export default function TopBar({ onFileLoaded }: Props) {
         onChange={handleFileChange}
       />
 
-      <button className="topbar-btn" onClick={handleLoadSample} disabled={!!loadingMsg}>
-        <Maximize2 size={13} />
-        Load Sample
+      <button
+        className="topbar-btn"
+        onClick={handleLoadSample}
+        disabled={!!loadingMsg}
+      >
+        <LayoutGrid size={12} />
+        Sample
       </button>
 
       {loadingMsg && (
-        <span style={{ fontSize: 11, color: 'var(--accent)', marginLeft: 8 }}>
-          ⏳ {loadingMsg}
+        <span style={{ fontSize: 10, color: 'var(--accent)', marginLeft: 6, fontFamily: 'monospace', opacity: 0.85 }}>
+          {loadingMsg}
         </span>
       )}
 
-      <span style={{ marginLeft: 'auto', fontSize: 11, opacity: 0.4 }}>
-        Drag &amp; drop GLB / GLTF / STEP onto viewport
-      </span>
     </div>
   )
 }

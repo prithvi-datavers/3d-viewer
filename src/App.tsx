@@ -55,8 +55,10 @@ export default function App() {
     <div className="app-layout">
       <TopBar />
       <div className="app-body">
-        <Toolbar />
-        <Viewer3D />
+        <div className="viewer-wrapper">
+          <Viewer3D />
+          <Toolbar />
+        </div>
         <PropertiesPanel />
       </div>
     </div>

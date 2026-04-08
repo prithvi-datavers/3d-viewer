@@ -143,18 +143,6 @@ export default function ViewCube() {
       <div className="viewcube-canvas-wrap">
         <canvas ref={canvasRef} style={{ width: '100%', height: '100%', outline: 'none', cursor: 'pointer' }} />
       </div>
-      <div className="viewcube-presets">
-        {VIEW_PRESETS.map((v) => (
-          <button
-            key={v.id}
-            className="viewcube-preset-btn"
-            title={v.tip}
-            onClick={() => animateToView(v.id)}
-          >
-            {v.label}
-          </button>
-        ))}
-      </div>
     </div>
   )
 }
