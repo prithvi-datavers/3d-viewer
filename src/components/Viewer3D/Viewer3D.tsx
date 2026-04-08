@@ -135,8 +135,9 @@ export default function Viewer3D() {
       applyShadingMode(shadingMode, meshes)
       fitToScene(cameraInternalRef.current, sceneRef.current.meshes.slice())
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
       console.error('Failed to load model:', err)
-      alert('Failed to load model.')
+      alert(`Failed to load model:\n${msg}`)
     } finally {
       setStepLoadingMsg(null)
     }

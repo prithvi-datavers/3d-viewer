@@ -29,8 +29,9 @@ export default function TopBar({ onFileLoaded }: Props) {
       setFileName(file.name)
       onFileLoaded?.(file.name)
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
       console.error('Load error:', err)
-      alert('Failed to load file. Make sure it is a valid GLTF/GLB/STEP file.')
+      alert(`Failed to load file:\n${msg}`)
     } finally {
       setLoadingMsg(null)
     }

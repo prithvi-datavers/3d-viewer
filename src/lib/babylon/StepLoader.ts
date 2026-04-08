@@ -24,10 +24,23 @@ async function getOC(): Promise<any> {
   if (initPromise) return initPromise
 
   initPromise = (async () => {
-    const initOpenCascade = (await import('opencascade.js')).default
-    const oc = await initOpenCascade()
-    ocInstance = oc
-    return oc
+    try {
+      console.log('[StepLoader] Importing opencascade.js…')
+      const mod = await import('opencascade.js')
+      const initOpenCascade = mod.default
+      if (typeof initOpenCascade !== 'function') {
+        throw new Error(`opencascade.js default export is not a function — got: ${typeof initOpenCascade}`)
+      }
+      console.log('[StepLoader] Initialising WASM…')
+      const oc = await initOpenCascade()
+      console.log('[StepLoader] WASM ready')
+      ocInstance = oc
+      return oc
+    } catch (err) {
+      // Reset so the user can retry
+      initPromise = null
+      throw err
+    }
   })()
 
   return initPromise
