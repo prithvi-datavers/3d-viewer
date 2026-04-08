@@ -29,16 +29,28 @@ const AXIS_DEFS = [
 ]
 
 export default function ViewCube() {
-  const canvasRef  = useRef<HTMLCanvasElement>(null)
-  const cubeCamRef = useRef<ArcRotateCamera | null>(null)
-  const mainCamera = useViewerStore((s) => s.cameraRef)
+  const canvasRef      = useRef<HTMLCanvasElement>(null)
+  const cubeCamRef     = useRef<ArcRotateCamera | null>(null)
+  const mainCameraRef  = useRef<ArcRotateCamera | null>(null)
+  const mainCamera     = useViewerStore((s) => s.cameraRef)
 
+  // Keep mainCameraRef current so the render loop always reads the latest value
+  useEffect(() => { mainCameraRef.current = mainCamera }, [mainCamera])
+
+  // Initialize engine + scene once on mount
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const engine = new Engine(canvas, true, { preserveDrawingBuffer: false, stencil: false, alpha: true })
-    const scene  = new Scene(engine)
+    let engine: Engine
+    let scene: Scene
+    try {
+      engine = new Engine(canvas, true, { preserveDrawingBuffer: false, stencil: false, alpha: true })
+      scene  = new Scene(engine)
+    } catch {
+      return // WebGL not available — hide cube gracefully
+    }
+
     scene.useRightHandedSystem = true
     scene.clearColor = new Color4(0, 0, 0, 0)
 
@@ -183,9 +195,11 @@ export default function ViewCube() {
     })
 
     engine.runRenderLoop(() => {
-      if (mainCamera && cubeCamRef.current) {
-        cubeCamRef.current.alpha = mainCamera.alpha
-        cubeCamRef.current.beta  = mainCamera.beta
+      // Read mainCameraRef so we always have the latest camera without re-running this effect
+      const mc = mainCameraRef.current
+      if (mc && cubeCamRef.current) {
+        cubeCamRef.current.alpha = mc.alpha
+        cubeCamRef.current.beta  = mc.beta
       }
       scene.render()
     })
@@ -193,8 +207,8 @@ export default function ViewCube() {
     const ro = new ResizeObserver(() => engine.resize())
     if (canvas.parentElement) ro.observe(canvas.parentElement)
 
-    return () => { ro.disconnect(); scene.dispose(); engine.dispose() }
-  }, [mainCamera])
+    return () => { ro.disconnect(); scene.dispose(); engine.dispose(); cubeCamRef.current = null }
+  }, []) // initialize once — mainCameraRef keeps the pointer current
 
   return (
     <div className="viewcube-widget">
