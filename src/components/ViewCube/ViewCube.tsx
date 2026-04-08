@@ -17,12 +17,12 @@ import { animateToView, VIEWS } from '../../lib/babylon/CameraManager'
 import type { ViewPreset } from '../../types/viewer'
 
 const FACE_DEFS = [
-  { name: 'FRONT',  pos: [0, -0.51, 0] as [number,number,number], rot: [Math.PI / 2, 0, 0] as [number,number,number],        color: '#3a5080', text: 'F' },
-  { name: 'BACK',   pos: [0, 0.51, 0]  as [number,number,number], rot: [-Math.PI / 2, 0, Math.PI] as [number,number,number],  color: '#3a5080', text: 'Bk' },
-  { name: 'RIGHT',  pos: [0.51, 0, 0]  as [number,number,number], rot: [0, 0, -Math.PI / 2] as [number,number,number],        color: '#407050', text: 'R' },
-  { name: 'LEFT',   pos: [-0.51, 0, 0] as [number,number,number], rot: [0, 0, Math.PI / 2] as [number,number,number],         color: '#407050', text: 'L' },
-  { name: 'TOP',    pos: [0, 0, 0.51]  as [number,number,number], rot: [0, 0, 0] as [number,number,number],                   color: '#704040', text: 'T' },
-  { name: 'BOTTOM', pos: [0, 0, -0.51] as [number,number,number], rot: [Math.PI, 0, 0] as [number,number,number],             color: '#704040', text: 'Bo' },
+  { name: 'FRONT',  pos: [0, -0.51, 0] as [number,number,number], rot: [Math.PI / 2, 0, 0] as [number,number,number],        color: '#6366f1', text: 'F' },
+  { name: 'BACK',   pos: [0, 0.51, 0]  as [number,number,number], rot: [-Math.PI / 2, 0, Math.PI] as [number,number,number],  color: '#6366f1', text: 'Bk' },
+  { name: 'RIGHT',  pos: [0.51, 0, 0]  as [number,number,number], rot: [0, 0, -Math.PI / 2] as [number,number,number],        color: '#10b981', text: 'R' },
+  { name: 'LEFT',   pos: [-0.51, 0, 0] as [number,number,number], rot: [0, 0, Math.PI / 2] as [number,number,number],         color: '#10b981', text: 'L' },
+  { name: 'TOP',    pos: [0, 0, 0.51]  as [number,number,number], rot: [0, 0, 0] as [number,number,number],                   color: '#f59e0b', text: 'T' },
+  { name: 'BOTTOM', pos: [0, 0, -0.51] as [number,number,number], rot: [Math.PI, 0, 0] as [number,number,number],             color: '#f59e0b', text: 'Bo' },
 ]
 
 const VIEW_PRESETS: { id: ViewPreset; label: string; tip: string }[] = [
@@ -47,11 +47,11 @@ export default function ViewCube() {
     const engine = new Engine(canvas, true, { preserveDrawingBuffer: false, stencil: false, alpha: true })
     const scene = new Scene(engine)
     scene.useRightHandedSystem = true
-    scene.clearColor = new Color4(0, 0, 0, 0)
+    scene.clearColor = new Color4(0, 0, 0, 0)  // transparent, shows widget bg
     scene.autoClear = true
     scene.autoClearDepthAndStencil = true
 
-    const camera = new ArcRotateCamera('cubeCamera', -Math.PI / 4, Math.PI / 3, 3.5, Vector3.Zero(), scene)
+    const camera = new ArcRotateCamera('cubeCamera', -Math.PI / 4, Math.PI / 3, 3.2, Vector3.Zero(), scene)
     camera.upVector = new Vector3(0, 0, 1)
     camera.minZ = 0.01
     camera.maxZ = 20
@@ -59,16 +59,16 @@ export default function ViewCube() {
     cubeCamRef.current = camera
 
     const light = new HemisphericLight('cubeLight', new Vector3(0.5, 0.3, 1), scene)
-    light.intensity = 1.2
+    light.intensity = 1.5
     light.diffuse = new Color3(1, 1, 1)
-    light.groundColor = new Color3(0.4, 0.4, 0.5)
+    light.groundColor = new Color3(0.6, 0.6, 0.65)
 
     // Cube body
     const box = MeshBuilder.CreateBox('cubeBody', { size: 1 }, scene)
     const boxMat = new StandardMaterial('cubeBodyMat', scene)
-    boxMat.diffuseColor = Color3.FromHexString('#2a3a5a')
-    boxMat.specularColor = new Color3(0.1, 0.1, 0.15)
-    boxMat.alpha = 0.85
+    boxMat.diffuseColor = Color3.FromHexString('#dde1ea')
+    boxMat.specularColor = new Color3(0.2, 0.2, 0.22)
+    boxMat.alpha = 0.90
     box.material = boxMat
     box.isPickable = false
 
@@ -103,9 +103,9 @@ export default function ViewCube() {
     const ring = MeshBuilder.CreateTorus('compassRing', { diameter: 0.85 * 2, thickness: 0.04, tessellation: 64 }, scene)
     ring.position.z = compassZ
     const ringMat = new StandardMaterial('ringMat', scene)
-    ringMat.diffuseColor = new Color3(0.5, 0.5, 0.6)
-    ringMat.emissiveColor = new Color3(0.2, 0.2, 0.25)
-    ringMat.alpha = 0.8
+    ringMat.diffuseColor = new Color3(0.7, 0.7, 0.75)
+    ringMat.emissiveColor = new Color3(0.3, 0.3, 0.32)
+    ringMat.alpha = 0.7
     ring.material = ringMat
     ring.isPickable = false
 

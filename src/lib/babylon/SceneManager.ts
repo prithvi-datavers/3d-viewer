@@ -32,7 +32,7 @@ export function initScene(canvas: HTMLCanvasElement): SceneSetup {
 
   const scene = new Scene(engine)
   scene.useRightHandedSystem = true
-  scene.clearColor = new Color4(0.078, 0.078, 0.169, 1)
+  scene.clearColor = new Color4(0.914, 0.914, 0.933, 1)
 
   // Camera
   const camera = new ArcRotateCamera('camera', CAMERA_ALPHA, CAMERA_BETA, CAMERA_RADIUS, new Vector3(0, 0, 0.5), scene)
@@ -49,15 +49,15 @@ export function initScene(canvas: HTMLCanvasElement): SceneSetup {
 
   // Lights
   const hemi = new HemisphericLight('hemiLight', new Vector3(0, 0, 1), scene)
-  hemi.intensity = 0.8
-  hemi.diffuse = Color3.FromHexString('#b1e1ff')
-  hemi.groundColor = Color3.FromHexString('#443366')
+  hemi.intensity = 1.0
+  hemi.diffuse = new Color3(1, 1, 1)
+  hemi.groundColor = new Color3(0.7, 0.7, 0.75)
 
   const main = new DirectionalLight('mainLight', new Vector3(-5, 5, -8).normalize(), scene)
-  main.intensity = 1.2
+  main.intensity = 1.4
 
   const fill = new DirectionalLight('fillLight', new Vector3(3, -4, -2).normalize(), scene)
-  fill.intensity = 0.4
+  fill.intensity = 0.5
 
   // Grid + axes
   const gridMesh = buildGrid(scene)
@@ -74,8 +74,8 @@ function buildGrid(scene: Scene) {
   const step = size / divisions
   const half = size / 2
 
-  const majorColor = Color3.FromHexString('#333355')
-  const minorColor = Color3.FromHexString('#222244')
+  const majorColor = Color3.FromHexString('#c0c0cc')
+  const minorColor = Color3.FromHexString('#d4d4de')
 
   const lines: Vector3[][] = []
   const colors: Color4[][] = []

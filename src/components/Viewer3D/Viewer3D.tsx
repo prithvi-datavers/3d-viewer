@@ -11,6 +11,7 @@ import ShadingController from './controllers/ShadingController'
 import SelectionController from './controllers/SelectionController'
 import MeasurementController from './controllers/MeasurementController'
 import StatusBar from '../StatusBar/StatusBar'
+import TopToolbar from '../Toolbar/TopToolbar'
 
 export default function Viewer3D() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -156,6 +157,7 @@ export default function Viewer3D() {
       <MeasurementController />
 
       {/* Overlays */}
+      <TopToolbar />
       <MeasurementLabels />
       <ViewCube />
       <StatusBar loadedFileName={loadedFileName} />

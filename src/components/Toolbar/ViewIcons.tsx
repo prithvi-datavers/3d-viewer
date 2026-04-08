@@ -1,6 +1,6 @@
 /**
- * Isometric cube-face SVG icons for view preset buttons.
- * Each icon shows a 3D cube with the relevant face highlighted in cyan.
+ * Isometric cube-face SVG icons for view preset buttons — light theme.
+ * Each icon shows a 3D cube with the relevant face highlighted in accent purple.
  */
 
 type ViewFace = 'front' | 'back' | 'right' | 'left' | 'top' | 'bottom' | 'iso'
@@ -11,36 +11,33 @@ interface Props {
 }
 
 export function ViewCubeIcon({ face, size = 16 }: Props) {
-  // Isometric cube in 20×20 viewbox
-  // Six points of the hexagonal outline + center intersection point
+  // Isometric projection points in a 20×20 viewbox
   const top = '10,2'
   const tr  = '18,6.5'
   const br  = '18,13.5'
   const bot = '10,18'
   const bl  = '2,13.5'
   const tl  = '2,6.5'
-  const ctr = '10,10'  // front-bottom vertex (where three faces meet)
 
-  // Three visible faces of the isometric cube
-  const topFace   = `${top} ${tr} ${ctr} ${tl}`
-  const rightFace = `${tr} ${br} ${bot} ${ctr}`
-  const leftFace  = `${tl} ${ctr} ${bot} ${bl}`
+  const topFace   = `${top} ${tr} 10,10 ${tl}`
+  const rightFace = `${tr} ${br} ${bot} 10,10`
+  const leftFace  = `${tl} 10,10 ${bot} ${bl}`
 
-  // Base dim colors (neutral)
-  const dTop    = 'rgba(255,255,255,0.10)'
-  const dRight  = 'rgba(255,255,255,0.06)'
-  const dLeft   = 'rgba(255,255,255,0.04)'
-  const dStroke = 'rgba(255,255,255,0.18)'
+  // Neutral (unlit) face colors — subtle for light bg
+  const dTop    = 'rgba(0,0,0,0.07)'
+  const dRight  = 'rgba(0,0,0,0.04)'
+  const dLeft   = 'rgba(0,0,0,0.02)'
+  const dStroke = 'rgba(0,0,0,0.22)'
 
-  // Accent (highlighted)
-  const aFill   = 'rgba(0,212,255,0.42)'
-  const aStroke = 'rgba(0,212,255,0.85)'
+  // Accent (active face) — purple
+  const aFill   = 'rgba(124,58,237,0.28)'
+  const aStroke = 'rgba(124,58,237,0.75)'
 
-  // ISO equal tints
-  const iTop    = 'rgba(0,212,255,0.20)'
-  const iRight  = 'rgba(0,212,255,0.13)'
-  const iLeft   = 'rgba(0,212,255,0.08)'
-  const iStroke = 'rgba(0,212,255,0.45)'
+  // ISO — all faces tinted equally
+  const iTop    = 'rgba(124,58,237,0.18)'
+  const iRight  = 'rgba(124,58,237,0.12)'
+  const iLeft   = 'rgba(124,58,237,0.07)'
+  const iStroke = 'rgba(124,58,237,0.50)'
 
   let tc = dTop,   ts = dStroke
   let rc = dRight, rs = dStroke
@@ -55,7 +52,6 @@ export function ViewCubeIcon({ face, size = 16 }: Props) {
     lc = iLeft; ls = iStroke
   }
 
-  // Mirror for "opposite" views: back↔front, left↔right, bottom↔top
   let transform: string | undefined
   if (face === 'back' || face === 'left')  transform = 'scale(-1,1) translate(-20,0)'
   if (face === 'bottom')                   transform = 'scale(1,-1) translate(0,-20)'
@@ -70,9 +66,9 @@ export function ViewCubeIcon({ face, size = 16 }: Props) {
       style={{ display: 'block', flexShrink: 0 }}
     >
       <g transform={transform}>
-        <polygon points={topFace}   fill={tc} stroke={ts} strokeWidth="0.75" strokeLinejoin="round" />
-        <polygon points={rightFace} fill={rc} stroke={rs} strokeWidth="0.75" strokeLinejoin="round" />
-        <polygon points={leftFace}  fill={lc} stroke={ls} strokeWidth="0.75" strokeLinejoin="round" />
+        <polygon points={topFace}   fill={tc} stroke={ts} strokeWidth="0.8" strokeLinejoin="round" />
+        <polygon points={rightFace} fill={rc} stroke={rs} strokeWidth="0.8" strokeLinejoin="round" />
+        <polygon points={leftFace}  fill={lc} stroke={ls} strokeWidth="0.8" strokeLinejoin="round" />
       </g>
     </svg>
   )

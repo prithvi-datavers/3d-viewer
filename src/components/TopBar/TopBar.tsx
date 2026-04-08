@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Upload, LayoutGrid } from 'lucide-react'
+import { Upload, LayoutGrid, Box } from 'lucide-react'
 import { useViewerStore } from '../../store/viewerStore'
 import { loadFile, loadSampleGeometry } from '../../lib/babylon/ModelLoader'
 import { applyShadingMode, getModelMeshes } from '../../lib/babylon/ShadingManager'
@@ -10,11 +10,12 @@ interface Props {
 }
 
 export default function TopBar({ onFileLoaded }: Props) {
-  const fileInputRef  = useRef<HTMLInputElement>(null)
-  const babylonScene  = useViewerStore((s) => s.babylonScene)
-  const cameraRef     = useViewerStore((s) => s.cameraRef)
-  const shadingMode   = useViewerStore((s) => s.shadingMode)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const babylonScene = useViewerStore((s) => s.babylonScene)
+  const cameraRef    = useViewerStore((s) => s.cameraRef)
+  const shadingMode  = useViewerStore((s) => s.shadingMode)
   const [loadingMsg, setLoadingMsg] = useState<string | null>(null)
+  const [fileName, setFileName]     = useState<string | null>(null)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -25,6 +26,7 @@ export default function TopBar({ onFileLoaded }: Props) {
       const meshes = await loadFile(file, babylonScene, (msg) => setLoadingMsg(msg || null))
       applyShadingMode(shadingMode, meshes)
       fitToScene(cameraRef, babylonScene.meshes.slice())
+      setFileName(file.name)
       onFileLoaded?.(file.name)
     } catch (err) {
       console.error('Load error:', err)
@@ -42,13 +44,16 @@ export default function TopBar({ onFileLoaded }: Props) {
     const meshes = loadSampleGeometry(babylonScene)
     applyShadingMode(shadingMode, meshes)
     fitToScene(cameraRef, babylonScene.meshes.slice())
+    setFileName('Sample Geometry')
     onFileLoaded?.('Sample Geometry')
   }
 
   return (
     <div className="topbar">
       <div className="topbar-brand">
-        <span className="topbar-dot" />
+        <div className="topbar-logo">
+          <Box size={14} color="#fff" strokeWidth={2} />
+        </div>
         <span className="topbar-title">3D Viewer</span>
       </div>
 
@@ -80,11 +85,14 @@ export default function TopBar({ onFileLoaded }: Props) {
       </button>
 
       {loadingMsg && (
-        <span style={{ fontSize: 10, color: 'var(--accent)', marginLeft: 6, fontFamily: 'monospace', opacity: 0.85 }}>
+        <span style={{ fontSize: 10.5, color: 'var(--accent)', marginLeft: 8, fontFamily: 'monospace' }}>
           {loadingMsg}
         </span>
       )}
 
+      {fileName && !loadingMsg && (
+        <span className="topbar-filename">{fileName}</span>
+      )}
     </div>
   )
 }

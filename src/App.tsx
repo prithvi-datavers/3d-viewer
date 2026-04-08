@@ -1,27 +1,28 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Viewer3D from './components/Viewer3D/Viewer3D'
-import Toolbar from './components/Toolbar/Toolbar'
 import TopBar from './components/TopBar/TopBar'
-import PropertiesPanel from './components/PropertiesPanel/PropertiesPanel'
+import LeftSidebar from './components/Sidebar/LeftSidebar'
+import RightPanel from './components/Sidebar/RightPanel'
+import type { SidebarPanel } from './components/Sidebar/LeftSidebar'
 import { useViewerStore } from './store/viewerStore'
 import { fitToScene } from './lib/babylon/CameraManager'
 import { deselectMesh } from './lib/babylon/SelectionManager'
 
 export default function App() {
-  const setShadingMode = useViewerStore((s) => s.setShadingMode)
-  const toggleGrid = useViewerStore((s) => s.toggleGrid)
+  const [activePanel, setActivePanel] = useState<SidebarPanel | null>(null)
+
+  const setShadingMode    = useViewerStore((s) => s.setShadingMode)
+  const toggleGrid        = useViewerStore((s) => s.toggleGrid)
   const toggleMeasureMode = useViewerStore((s) => s.toggleMeasureMode)
-  const setCameraMode = useViewerStore((s) => s.setCameraMode)
-  const cameraMode = useViewerStore((s) => s.cameraMode)
-  const cameraRef = useViewerStore((s) => s.cameraRef)
-  const babylonScene = useViewerStore((s) => s.babylonScene)
-  const setSelection = useViewerStore((s) => s.setSelection)
+  const setCameraMode     = useViewerStore((s) => s.setCameraMode)
+  const cameraMode        = useViewerStore((s) => s.cameraMode)
+  const cameraRef         = useViewerStore((s) => s.cameraRef)
+  const babylonScene      = useViewerStore((s) => s.babylonScene)
+  const setSelection      = useViewerStore((s) => s.setSelection)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      // Ignore when typing in an input
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
-
       switch (e.key.toLowerCase()) {
         case 'w':
           setShadingMode('wireframe')
@@ -38,13 +39,13 @@ export default function App() {
         case 'm':
           toggleMeasureMode()
           break
-        case 'escape':
-          // Cancel measure + deselect
+        case 'escape': {
           const store = useViewerStore.getState()
           if (store.measureMode) store.toggleMeasureMode()
           deselectMesh()
           setSelection(null, null)
           break
+        }
       }
     }
     window.addEventListener('keydown', onKey)
@@ -55,11 +56,9 @@ export default function App() {
     <div className="app-layout">
       <TopBar />
       <div className="app-body">
-        <div className="viewer-wrapper">
-          <Viewer3D />
-          <Toolbar />
-        </div>
-        <PropertiesPanel />
+        <LeftSidebar activePanel={activePanel} onSelect={setActivePanel} />
+        <Viewer3D />
+        <RightPanel activePanel={activePanel} />
       </div>
     </div>
   )
