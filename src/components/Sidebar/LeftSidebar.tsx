@@ -1,15 +1,14 @@
 import { useRef } from 'react'
-import { Upload, LayoutGrid, Layers, Ruler } from 'lucide-react'
+import { Upload, LayoutGrid, Ruler } from 'lucide-react'
 import { useViewerStore } from '../../store/viewerStore'
 import { loadFile, loadSampleGeometry } from '../../lib/babylon/ModelLoader'
 import { applyShadingMode, getModelMeshes } from '../../lib/babylon/ShadingManager'
 import { fitToScene } from '../../lib/babylon/CameraManager'
 import type { ReactNode } from 'react'
 
-export type SidebarPanel = 'display' | 'measure' | 'tree'
+export type SidebarPanel = 'measure' | 'tree'
 
 const PANEL_ITEMS: { id: SidebarPanel; icon: ReactNode; label: string }[] = [
-  { id: 'display', icon: <Layers     size={18} strokeWidth={1.75} />, label: 'Display' },
   { id: 'measure', icon: <Ruler      size={18} strokeWidth={1.75} />, label: 'Measure' },
   { id: 'tree',    icon: <LayoutGrid size={18} strokeWidth={1.75} />, label: 'Tree'    },
 ]

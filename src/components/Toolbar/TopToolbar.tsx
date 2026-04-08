@@ -1,4 +1,4 @@
-import { Eye, Maximize2, Grid3X3, Layers, MousePointer2 } from 'lucide-react'
+import { Eye, Maximize2, Grid3X3, Layers, MousePointer2, Square } from 'lucide-react'
 import { useViewerStore } from '../../store/viewerStore'
 import { fitToScene, animateToView } from '../../lib/babylon/CameraManager'
 import { ViewCubeIcon } from './ViewIcons'
@@ -56,11 +56,25 @@ export default function TopToolbar() {
         <Maximize2 size={15} strokeWidth={1.75} />
       </button>
       <button
+        className={`pill-btn${shadingMode === 'shaded' ? ' active' : ''}`}
+        title="Solid"
+        onClick={() => setShadingMode('shaded')}
+      >
+        <Square size={15} strokeWidth={1.75} />
+      </button>
+      <button
         className={`pill-btn${shadingMode === 'wireframe' ? ' active' : ''}`}
         title="Wireframe (W)"
-        onClick={() => setShadingMode(shadingMode === 'wireframe' ? 'shaded' : 'wireframe')}
+        onClick={() => setShadingMode('wireframe')}
       >
         <Layers size={15} strokeWidth={1.75} />
+      </button>
+      <button
+        className={`pill-btn${shadingMode === 'shadedEdges' ? ' active' : ''}`}
+        title="Solid + Edges"
+        onClick={() => setShadingMode('shadedEdges')}
+      >
+        <Square size={15} strokeWidth={2.5} />
       </button>
       <button
         className={`pill-btn${gridVisible ? ' active' : ''}`}

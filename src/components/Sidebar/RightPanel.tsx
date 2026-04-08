@@ -1,13 +1,6 @@
 import { Trash2, Ruler } from 'lucide-react'
 import { useViewerStore } from '../../store/viewerStore'
 import type { SidebarPanel } from './LeftSidebar'
-import type { ShadingMode } from '../../types/viewer'
-
-const SHADING_OPTIONS: { mode: ShadingMode; label: string }[] = [
-  { mode: 'shaded',      label: 'Solid'        },
-  { mode: 'wireframe',   label: 'Wireframe'    },
-  { mode: 'shadedEdges', label: 'Solid + Edges' },
-]
 
 interface Props {
   activePanel: SidebarPanel | null
@@ -19,53 +12,10 @@ export default function RightPanel({ activePanel }: Props) {
   return (
     <div className={`right-panel${isOpen ? ' open' : ''}`}>
       <div className="right-panel-inner">
-        {activePanel === 'display' && <DisplayPanel />}
         {activePanel === 'measure' && <MeasurePanel />}
         {activePanel === 'tree'    && <TreePanel />}
       </div>
     </div>
-  )
-}
-
-/* ── Display Panel ─────────────────────────────────── */
-function DisplayPanel() {
-  const shadingMode    = useViewerStore((s) => s.shadingMode)
-  const setShadingMode = useViewerStore((s) => s.setShadingMode)
-  const gridVisible    = useViewerStore((s) => s.gridVisible)
-  const toggleGrid     = useViewerStore((s) => s.toggleGrid)
-
-  return (
-    <>
-      <div className="panel-header">
-        <span className="panel-header-title">Display</span>
-      </div>
-      <div className="panel-body">
-        <div className="panel-section">
-          <div className="panel-section-label">Shading Mode</div>
-          <div className="display-btn-group">
-            {SHADING_OPTIONS.map(({ mode, label }) => (
-              <button
-                key={mode}
-                className={`display-btn${shadingMode === mode ? ' active' : ''}`}
-                onClick={() => setShadingMode(mode)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="panel-section">
-          <div className="panel-section-label">Scene</div>
-          <button
-            className={`display-btn${gridVisible ? ' active' : ''}`}
-            onClick={toggleGrid}
-          >
-            {gridVisible ? 'Hide Grid' : 'Show Grid'}
-          </button>
-        </div>
-      </div>
-    </>
   )
 }
 
