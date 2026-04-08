@@ -51,7 +51,7 @@ export default function ViewCube() {
     scene.autoClear = true
     scene.autoClearDepthAndStencil = true
 
-    const camera = new ArcRotateCamera('cubeCamera', -Math.PI / 4, Math.PI / 3, 3.2, Vector3.Zero(), scene)
+    const camera = new ArcRotateCamera('cubeCamera', -Math.PI / 4, Math.PI / 3, 2.4, Vector3.Zero(), scene)
     camera.upVector = new Vector3(0, 0, 1)
     camera.minZ = 0.01
     camera.maxZ = 20
@@ -82,8 +82,12 @@ export default function ViewCube() {
       const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
       ctx.fillStyle = def.color
       ctx.fillRect(0, 0, 256, 256)
+      // Dark edge border
+      ctx.strokeStyle = 'rgba(0,0,0,0.55)'
+      ctx.lineWidth = 14
+      ctx.strokeRect(7, 7, 242, 242)
       ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 56px Arial'
+      ctx.font = 'bold 60px Arial'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       ctx.fillText(def.text, 128, 128)
