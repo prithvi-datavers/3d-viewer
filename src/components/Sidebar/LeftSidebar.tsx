@@ -1,14 +1,17 @@
-import { MousePointer2, Layers, LayoutGrid, Ruler, Eye } from 'lucide-react'
+import { useRef } from 'react'
+import { Upload, LayoutGrid, Layers, Ruler } from 'lucide-react'
+import { useViewerStore } from '../../store/viewerStore'
+import { loadFile, loadSampleGeometry } from '../../lib/babylon/ModelLoader'
+import { applyShadingMode, getModelMeshes } from '../../lib/babylon/ShadingManager'
+import { fitToScene } from '../../lib/babylon/CameraManager'
 import type { ReactNode } from 'react'
 
-export type SidebarPanel = 'select' | 'display' | 'view' | 'measure' | 'tree'
+export type SidebarPanel = 'display' | 'measure' | 'tree'
 
-const ITEMS: { id: SidebarPanel; icon: ReactNode; label: string }[] = [
-  { id: 'select',  icon: <MousePointer2 size={18} strokeWidth={1.75} />, label: 'Select'  },
-  { id: 'display', icon: <Layers        size={18} strokeWidth={1.75} />, label: 'Display' },
-  { id: 'view',    icon: <Eye           size={18} strokeWidth={1.75} />, label: 'View'    },
-  { id: 'measure', icon: <Ruler         size={18} strokeWidth={1.75} />, label: 'Measure' },
-  { id: 'tree',    icon: <LayoutGrid    size={18} strokeWidth={1.75} />, label: 'Tree'    },
+const PANEL_ITEMS: { id: SidebarPanel; icon: ReactNode; label: string }[] = [
+  { id: 'display', icon: <Layers     size={18} strokeWidth={1.75} />, label: 'Display' },
+  { id: 'measure', icon: <Ruler      size={18} strokeWidth={1.75} />, label: 'Measure' },
+  { id: 'tree',    icon: <LayoutGrid size={18} strokeWidth={1.75} />, label: 'Tree'    },
 ]
 
 interface Props {
@@ -17,20 +20,68 @@ interface Props {
 }
 
 export default function LeftSidebar({ activePanel, onSelect }: Props) {
+  const fileInputRef  = useRef<HTMLInputElement>(null)
+  const babylonScene  = useViewerStore((s) => s.babylonScene)
+  const cameraRef     = useViewerStore((s) => s.cameraRef)
+  const shadingMode   = useViewerStore((s) => s.shadingMode)
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !babylonScene || !cameraRef) return
+    getModelMeshes(babylonScene).forEach((m) => m.dispose())
+    try {
+      const meshes = await loadFile(file, babylonScene)
+      applyShadingMode(shadingMode, meshes)
+      fitToScene(cameraRef, babylonScene.meshes.slice())
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      alert(`Failed to load file:\n${msg}`)
+    }
+    e.target.value = ''
+  }
+
+  const handleSample = () => {
+    if (!babylonScene || !cameraRef) return
+    getModelMeshes(babylonScene).forEach((m) => m.dispose())
+    const meshes = loadSampleGeometry(babylonScene)
+    applyShadingMode(shadingMode, meshes)
+    fitToScene(cameraRef, babylonScene.meshes.slice())
+  }
+
   return (
     <div className="left-sidebar">
-      {ITEMS.map(({ id, icon, label }, i) => (
-        <>
-          {i === ITEMS.length - 1 && <div key={`sep-${id}`} className="sidebar-sep" />}
-          <div
-            key={id}
-            className={`sidebar-item${activePanel === id ? ' active' : ''}`}
-            onClick={() => onSelect(activePanel === id ? null : id)}
-          >
-            {icon}
-            <span className="sidebar-item-label">{label}</span>
-          </div>
-        </>
+      {/* Action buttons */}
+      <div
+        className="sidebar-item sidebar-action"
+        onClick={() => fileInputRef.current?.click()}
+      >
+        <Upload size={18} strokeWidth={1.75} />
+        <span className="sidebar-item-label">Load</span>
+      </div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".glb,.gltf,.stp,.step"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+      <div className="sidebar-item sidebar-action" onClick={handleSample}>
+        <LayoutGrid size={18} strokeWidth={1.75} />
+        <span className="sidebar-item-label">Sample</span>
+      </div>
+
+      <div className="sidebar-sep" />
+
+      {/* Panel nav items */}
+      {PANEL_ITEMS.map(({ id, icon, label }) => (
+        <div
+          key={id}
+          className={`sidebar-item${activePanel === id ? ' active' : ''}`}
+          onClick={() => onSelect(activePanel === id ? null : id)}
+        >
+          {icon}
+          <span className="sidebar-item-label">{label}</span>
+        </div>
       ))}
     </div>
   )

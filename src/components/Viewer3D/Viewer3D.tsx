@@ -14,6 +14,7 @@ import StatusBar from '../StatusBar/StatusBar'
 import TopToolbar from '../Toolbar/TopToolbar'
 import LeftSidebar from '../Sidebar/LeftSidebar'
 import RightPanel from '../Sidebar/RightPanel'
+import BrandWidget from '../TopBar/BrandWidget'
 import type { SidebarPanel } from '../Sidebar/LeftSidebar'
 
 interface Props {
@@ -165,8 +166,11 @@ export default function Viewer3D({ activePanel, onPanelSelect }: Props) {
       <SelectionController />
       <MeasurementController />
 
-      {/* Floating sidebar + panel */}
-      <LeftSidebar activePanel={activePanel} onSelect={onPanelSelect} />
+      {/* Floating left column: brand + sidebar */}
+      <div className="sidebar-col">
+        <BrandWidget />
+        <LeftSidebar activePanel={activePanel} onSelect={onPanelSelect} />
+      </div>
       <RightPanel activePanel={activePanel} />
 
       {/* Overlays */}

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import Viewer3D from './components/Viewer3D/Viewer3D'
-import TopBar from './components/TopBar/TopBar'
 import type { SidebarPanel } from './components/Sidebar/LeftSidebar'
 import { useViewerStore } from './store/viewerStore'
 import { fitToScene } from './lib/babylon/CameraManager'
@@ -22,21 +21,11 @@ export default function App() {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
       switch (e.key.toLowerCase()) {
-        case 'w':
-          setShadingMode('wireframe')
-          break
-        case 'g':
-          toggleGrid()
-          break
-        case 'f':
-          if (cameraRef && babylonScene) fitToScene(cameraRef, babylonScene.meshes.slice())
-          break
-        case 'p':
-          setCameraMode(cameraMode === 'perspective' ? 'orthographic' : 'perspective')
-          break
-        case 'm':
-          toggleMeasureMode()
-          break
+        case 'w': setShadingMode('wireframe'); break
+        case 'g': toggleGrid(); break
+        case 'f': if (cameraRef && babylonScene) fitToScene(cameraRef, babylonScene.meshes.slice()); break
+        case 'p': setCameraMode(cameraMode === 'perspective' ? 'orthographic' : 'perspective'); break
+        case 'm': toggleMeasureMode(); break
         case 'escape': {
           const store = useViewerStore.getState()
           if (store.measureMode) store.toggleMeasureMode()
@@ -50,10 +39,5 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [cameraMode, cameraRef, babylonScene])
 
-  return (
-    <div className="app-layout">
-      <TopBar />
-      <Viewer3D activePanel={activePanel} onPanelSelect={setActivePanel} />
-    </div>
-  )
+  return <Viewer3D activePanel={activePanel} onPanelSelect={setActivePanel} />
 }

@@ -1,24 +1,12 @@
 import { Trash2, Ruler } from 'lucide-react'
 import { useViewerStore } from '../../store/viewerStore'
-import { animateToView } from '../../lib/babylon/CameraManager'
-import { ViewCubeIcon } from '../Toolbar/ViewIcons'
 import type { SidebarPanel } from './LeftSidebar'
-import type { ViewPreset, ShadingMode } from '../../types/viewer'
+import type { ShadingMode } from '../../types/viewer'
 
 const SHADING_OPTIONS: { mode: ShadingMode; label: string }[] = [
   { mode: 'shaded',      label: 'Solid'        },
   { mode: 'wireframe',   label: 'Wireframe'    },
   { mode: 'shadedEdges', label: 'Solid + Edges' },
-]
-
-const VIEW_PRESETS: { id: ViewPreset; face: Parameters<typeof ViewCubeIcon>[0]['face']; label: string }[] = [
-  { id: 'FRONT',  face: 'front',  label: 'Front'  },
-  { id: 'BACK',   face: 'back',   label: 'Back'   },
-  { id: 'RIGHT',  face: 'right',  label: 'Right'  },
-  { id: 'LEFT',   face: 'left',   label: 'Left'   },
-  { id: 'TOP',    face: 'top',    label: 'Top'    },
-  { id: 'BOTTOM', face: 'bottom', label: 'Bottom' },
-  { id: 'ISO',    face: 'iso',    label: 'ISO'    },
 ]
 
 interface Props {
@@ -31,53 +19,11 @@ export default function RightPanel({ activePanel }: Props) {
   return (
     <div className={`right-panel${isOpen ? ' open' : ''}`}>
       <div className="right-panel-inner">
-        {activePanel === 'select'  && <SelectPanel />}
         {activePanel === 'display' && <DisplayPanel />}
-        {activePanel === 'view'    && <ViewPanel />}
         {activePanel === 'measure' && <MeasurePanel />}
         {activePanel === 'tree'    && <TreePanel />}
       </div>
     </div>
-  )
-}
-
-/* ── Select Panel ──────────────────────────────────── */
-function SelectPanel() {
-  const selectionInfo    = useViewerStore((s) => s.selectionInfo)
-  const selectedMeshName = useViewerStore((s) => s.selectedMeshName)
-
-  return (
-    <>
-      <div className="panel-header">
-        <span className="panel-header-title">Selection</span>
-      </div>
-      <div className="panel-body">
-        {selectionInfo ? (
-          <div className="panel-section">
-            <div className="prop-row">
-              <span className="prop-label">Name</span>
-              <span className="prop-value" style={{ fontSize: 10, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {selectedMeshName}
-              </span>
-            </div>
-            <div className="prop-row">
-              <span className="prop-label">Width (X)</span>
-              <span className="prop-value">{selectionInfo.width}</span>
-            </div>
-            <div className="prop-row">
-              <span className="prop-label">Depth (Y)</span>
-              <span className="prop-value">{selectionInfo.depth}</span>
-            </div>
-            <div className="prop-row">
-              <span className="prop-label">Height (Z)</span>
-              <span className="prop-value">{selectionInfo.height}</span>
-            </div>
-          </div>
-        ) : (
-          <p className="panel-empty-msg">Click a mesh in the viewport to inspect its properties.</p>
-        )}
-      </div>
-    </>
   )
 }
 
@@ -117,31 +63,6 @@ function DisplayPanel() {
           >
             {gridVisible ? 'Hide Grid' : 'Show Grid'}
           </button>
-        </div>
-      </div>
-    </>
-  )
-}
-
-/* ── View Panel ────────────────────────────────────── */
-function ViewPanel() {
-  return (
-    <>
-      <div className="panel-header">
-        <span className="panel-header-title">View Presets</span>
-      </div>
-      <div className="panel-body">
-        <div className="view-preset-grid">
-          {VIEW_PRESETS.map(({ id, face, label }) => (
-            <button
-              key={id}
-              className="view-preset-btn"
-              onClick={() => animateToView(id)}
-            >
-              <ViewCubeIcon face={face} size={22} />
-              <span className="view-preset-label">{label}</span>
-            </button>
-          ))}
         </div>
       </div>
     </>
