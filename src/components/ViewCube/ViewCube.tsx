@@ -8,36 +8,47 @@ import { useViewerStore } from '../../store/viewerStore'
 import { animateToView, VIEWS } from '../../lib/babylon/CameraManager'
 import type { ViewPreset } from '../../types/viewer'
 
-// Face planes positioned just outside each cube face — plane UV is always correct
+// Face planes at exactly ±0.5 — same UV as before (no mirroring)
 const FACE_DEFS = [
-  { name: 'FRONT',  pos: [0, -0.502, 0]  as [number,number,number], rot: [ Math.PI/2, 0, 0]       as [number,number,number] },
-  { name: 'BACK',   pos: [0,  0.502, 0]  as [number,number,number], rot: [-Math.PI/2, 0, Math.PI] as [number,number,number] },
-  { name: 'RIGHT',  pos: [0.502,  0, 0]  as [number,number,number], rot: [0, 0, -Math.PI/2]       as [number,number,number] },
-  { name: 'LEFT',   pos: [-0.502, 0, 0]  as [number,number,number], rot: [0, 0,  Math.PI/2]       as [number,number,number] },
-  { name: 'TOP',    pos: [0, 0,  0.502]  as [number,number,number], rot: [0, 0, 0]                as [number,number,number] },
-  { name: 'BOTTOM', pos: [0, 0, -0.502]  as [number,number,number], rot: [Math.PI, 0, 0]          as [number,number,number] },
+  { name: 'FRONT',  pos: [0, -0.5, 0]  as [number,number,number], rot: [ Math.PI/2, 0, 0]       as [number,number,number] },
+  { name: 'BACK',   pos: [0,  0.5, 0]  as [number,number,number], rot: [-Math.PI/2, 0, Math.PI] as [number,number,number] },
+  { name: 'RIGHT',  pos: [0.5,  0, 0]  as [number,number,number], rot: [0, 0, -Math.PI/2]       as [number,number,number] },
+  { name: 'LEFT',   pos: [-0.5, 0, 0]  as [number,number,number], rot: [0, 0,  Math.PI/2]       as [number,number,number] },
+  { name: 'TOP',    pos: [0, 0,  0.5]  as [number,number,number], rot: [0, 0, 0]                as [number,number,number] },
+  { name: 'BOTTOM', pos: [0, 0, -0.5]  as [number,number,number], rot: [Math.PI, 0, 0]          as [number,number,number] },
 ]
 
 const FACE_LABELS: Record<string, string> = {
   FRONT: 'FRONT', BACK: 'BACK', RIGHT: 'RIGHT', LEFT: 'LEFT', TOP: 'TOP', BOTTOM: 'BTM',
 }
 
-// Axis definitions — inner end (inside cube), outer end (badge position)
+// 8 cube corners for edge lines
+const s = 0.5
+const CORNERS: [number,number,number][] = [
+  [-s,-s,-s],[s,-s,-s],[s,s,-s],[-s,s,-s],
+  [-s,-s, s],[s,-s, s],[s,s, s],[-s,s, s],
+]
+const EDGE_PAIRS: [number,number][] = [
+  [0,1],[1,2],[2,3],[3,0],  // bottom ring
+  [4,5],[5,6],[6,7],[7,4],  // top ring
+  [0,4],[1,5],[2,6],[3,7],  // verticals
+]
+
+// Axis: inner = at face, outer = badge position
 const AXIS_DEFS = [
-  { label: 'X', inner: new Vector3(0.48, 0, 0),  outer: new Vector3(0.72, 0, 0),  hex: '#e53e3e' },
-  { label: 'Y', inner: new Vector3(0, 0.48, 0),  outer: new Vector3(0, 0.72, 0),  hex: '#38a169' },
-  { label: 'Z', inner: new Vector3(0, 0, 0.48),  outer: new Vector3(0, 0, 0.72),  hex: '#3182ce' },
+  { label: 'X', inner: new Vector3(0.5, 0, 0),  outer: new Vector3(0.72, 0, 0),  hex: '#e53e3e' },
+  { label: 'Y', inner: new Vector3(0, 0.5, 0),  outer: new Vector3(0, 0.72, 0),  hex: '#38a169' },
+  { label: 'Z', inner: new Vector3(0, 0, 0.5),  outer: new Vector3(0, 0, 0.72),  hex: '#3182ce' },
 ]
 
 function makeFaceTex(label: string, scene: Scene): DynamicTexture {
   const tex = new DynamicTexture(`faceTex_${label}`, { width: 256, height: 256 }, scene, false)
   const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
-  ctx.clearRect(0, 0, 256, 256)
-  ctx.fillStyle = '#f8f8fb'
+  ctx.fillStyle = '#f7f7fa'
   ctx.fillRect(0, 0, 256, 256)
-  ctx.strokeStyle = 'rgba(0,0,0,0.16)'
-  ctx.lineWidth = 5
-  ctx.strokeRect(2.5, 2.5, 251, 251)
+  ctx.strokeStyle = 'rgba(0,0,0,0.14)'
+  ctx.lineWidth = 4
+  ctx.strokeRect(2, 2, 252, 252)
   const fontSize = label.length >= 5 ? 40 : 50
   ctx.fillStyle = '#111111'
   ctx.font = `bold ${fontSize}px Arial, sans-serif`
@@ -101,68 +112,57 @@ export default function ViewCube() {
     camera.orthoTop  =  oh; camera.orthoBottom = -oh
     cubeCamRef.current = camera
 
-    // Lights
+    // Lights — even illumination, face planes show as uniform white
     const hemi = new HemisphericLight('h', new Vector3(0, 0, 1), scene)
-    hemi.intensity = 0.85; hemi.diffuse = new Color3(1, 1, 1)
-    hemi.groundColor = new Color3(0.6, 0.6, 0.65)
+    hemi.intensity = 1.0; hemi.diffuse = new Color3(1, 1, 1)
+    hemi.groundColor = new Color3(0.8, 0.8, 0.82)
     const dir = new DirectionalLight('d', new Vector3(-1, -0.5, -1).normalize(), scene)
-    dir.intensity = 0.4
+    dir.intensity = 0.2
 
-    // Solid white cube body
-    const box = MeshBuilder.CreateBox('cubeBody', { size: 1 }, scene)
-    const boxMat = new StandardMaterial('cubeBodyMat', scene)
-    boxMat.diffuseColor  = new Color3(0.96, 0.96, 0.98)
-    boxMat.specularColor = new Color3(0.08, 0.08, 0.1)
-    boxMat.specularPower = 32
-    box.material = boxMat
-    box.isPickable = false
-    box.enableEdgesRendering()
-    box.edgesWidth = 3.5
-    box.edgesColor = new Color4(0.08, 0.08, 0.12, 1)
-
-    // Face label planes — positioned just outside, UV always correct
+    // ── Face planes at exactly ±0.5 (no protrusion) ──────────────────────
     FACE_DEFS.forEach((def) => {
-      const plane = MeshBuilder.CreatePlane(`face_${def.name}`, { size: 0.98 }, scene)
+      const plane = MeshBuilder.CreatePlane(`face_${def.name}`, { size: 1.0 }, scene)
       plane.position = new Vector3(...def.pos)
       plane.rotation = new Vector3(...def.rot)
-
       const mat = new StandardMaterial(`faceMat_${def.name}`, scene)
       mat.diffuseTexture = makeFaceTex(FACE_LABELS[def.name], scene)
       mat.specularColor  = new Color3(0, 0, 0)
-      mat.emissiveColor  = new Color3(0.08, 0.08, 0.08)
+      mat.emissiveColor  = new Color3(0.1, 0.1, 0.1)
       mat.backFaceCulling = true
       plane.material = mat
       plane.metadata = { viewName: def.name }
     })
 
-    // Axis lines — inside portion subtle, outside portion bold
+    // ── 12 cube edge lines ────────────────────────────────────────────────
+    const edgeColor = new Color4(0.1, 0.1, 0.14, 1.0)
+    EDGE_PAIRS.forEach(([a, b], i) => {
+      const line = MeshBuilder.CreateLines(`edge_${i}`, {
+        points: [new Vector3(...CORNERS[a]), new Vector3(...CORNERS[b])],
+        colors: [edgeColor, edgeColor],
+      }, scene)
+      line.isPickable = false
+    })
+
+    // ── Axis lines: inside subtle, outside bold ───────────────────────────
     AXIS_DEFS.forEach((ax) => {
       const c = Color3.FromHexString(ax.hex)
-      // Inside: origin → inner face (subtle, low alpha)
+      // Inside: origin → face (subtle)
       MeshBuilder.CreateLines(`axIn_${ax.label}`, {
         points: [Vector3.Zero(), ax.inner],
-        colors: [
-          new Color4(c.r, c.g, c.b, 0.18),
-          new Color4(c.r, c.g, c.b, 0.35),
-        ],
+        colors: [new Color4(c.r, c.g, c.b, 0.15), new Color4(c.r, c.g, c.b, 0.30)],
       }, scene).isPickable = false
-
-      // Outside: face → badge (bold, full alpha)
+      // Outside: face → badge (bold)
       MeshBuilder.CreateLines(`axOut_${ax.label}`, {
         points: [ax.inner, ax.outer],
-        colors: [
-          new Color4(c.r, c.g, c.b, 0.7),
-          new Color4(c.r, c.g, c.b, 1.0),
-        ],
+        colors: [new Color4(c.r, c.g, c.b, 0.65), new Color4(c.r, c.g, c.b, 1.0)],
       }, scene).isPickable = false
     })
 
-    // Axis badge planes (billboarded colored circle + white letter)
+    // ── Axis badge planes (billboarded, colored circle + white letter) ────
     AXIS_DEFS.forEach((ax) => {
       const badge = MeshBuilder.CreatePlane(`badge_${ax.label}`, { size: 0.26 }, scene)
       badge.position = ax.outer.clone()
       badge.billboardMode = 7
-
       const mat = new StandardMaterial(`badgeMat_${ax.label}`, scene)
       mat.diffuseTexture = makeBadgeTex(ax.label, ax.hex, scene)
       mat.useAlphaFromDiffuseTexture = true
@@ -173,7 +173,7 @@ export default function ViewCube() {
       badge.isPickable = false
     })
 
-    // Click → animate main camera
+    // ── Click → animate main camera ───────────────────────────────────────
     scene.onPointerObservable.add((info) => {
       if (info.type !== PointerEventTypes.POINTERTAP) return
       const viewName = info.pickInfo?.pickedMesh?.metadata?.viewName as ViewPreset | undefined
