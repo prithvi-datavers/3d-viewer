@@ -164,7 +164,7 @@ export default function ViewCube() {
       plane.position = new Vector3(f.nx, f.ny, f.nz).scaleInPlace(0.501)
       plane.rotation = faceEuler(f.nx, f.ny, f.nz)
       const mat = new StandardMaterial(`fm_${f.view}`, scene)
-      mat.diffuseColor     = new Color3(0, 0, 0)   // no diffuse lighting contribution
+      mat.diffuseColor     = new Color3(0, 0, 0)
       mat.emissiveTexture  = makeFaceTex(f.label, scene)
       mat.emissiveColor    = new Color3(1, 1, 1)
       mat.specularColor    = new Color3(0, 0, 0)
