@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { Upload, LayoutGrid, Ruler } from 'lucide-react'
 import { useViewerStore } from '../../store/viewerStore'
-import { loadFile } from '../../lib/babylon/ModelLoader'
+import { loadFile, buildPartEntries } from '../../lib/babylon/ModelLoader'
 import { applyShadingMode, getModelMeshes } from '../../lib/babylon/ShadingManager'
 import { fitToScene } from '../../lib/babylon/CameraManager'
 import type { ReactNode } from 'react'
@@ -25,14 +25,17 @@ export default function LeftSidebar({ activePanel, onSelect }: Props) {
   const shadingMode     = useViewerStore((s) => s.shadingMode)
   const setLoadedFileName = useViewerStore((s) => s.setLoadedFileName)
   const setLoadingMsg   = useViewerStore((s) => s.setLoadingMsg)
+  const setModelParts   = useViewerStore((s) => s.setModelParts)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !babylonScene || !cameraRef) return
     getModelMeshes(babylonScene).forEach((m) => m.dispose())
+    setModelParts([])
     try {
       setLoadingMsg(`Loading ${file.name}…`)
       const meshes = await loadFile(file, babylonScene, () => {})
+      setModelParts(buildPartEntries(meshes))
       applyShadingMode(shadingMode, meshes)
       fitToScene(cameraRef, babylonScene.meshes.slice())
       setLoadedFileName(file.name)

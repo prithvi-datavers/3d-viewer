@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { Scene, ArcRotateCamera } from '@babylonjs/core'
-import type { ShadingMode, CameraMode, MeasurementEntry, SelectionInfo } from '../types/viewer'
+import type { ShadingMode, CameraMode, MeasurementEntry, SelectionInfo, PartEntry } from '../types/viewer'
 
 interface ViewerStore {
   // Scene
@@ -39,6 +39,11 @@ interface ViewerStore {
   loadingMsg: string | null
   setLoadedFileName: (name: string | null) => void
   setLoadingMsg: (msg: string | null) => void
+
+  // Model tree
+  modelParts: PartEntry[]
+  setModelParts: (parts: PartEntry[]) => void
+  setPartVisibility: (name: string, visible: boolean) => void
 }
 
 export const useViewerStore = create<ViewerStore>((set) => ({
@@ -78,4 +83,10 @@ export const useViewerStore = create<ViewerStore>((set) => ({
   loadingMsg: null,
   setLoadedFileName: (loadedFileName) => set({ loadedFileName }),
   setLoadingMsg: (loadingMsg) => set({ loadingMsg }),
+
+  // Model tree
+  modelParts: [],
+  setModelParts: (modelParts) => set({ modelParts }),
+  setPartVisibility: (name, visible) =>
+    set((s) => ({ modelParts: s.modelParts.map((p) => p.name === name ? { ...p, visible } : p) })),
 }))

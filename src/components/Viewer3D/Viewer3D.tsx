@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from 'react'
 import { Camera } from '@babylonjs/core'
 import { useViewerStore } from '../../store/viewerStore'
 import { initScene } from '../../lib/babylon/SceneManager'
-import { loadFile, loadSampleGeometry } from '../../lib/babylon/ModelLoader'
+import { loadFile, loadSampleGeometry, buildPartEntries } from '../../lib/babylon/ModelLoader'
 import { applyShadingMode, getModelMeshes } from '../../lib/babylon/ShadingManager'
 import { fitToScene } from '../../lib/babylon/CameraManager'
 import MeasurementLabels from './MeasurementLabels'
@@ -34,6 +34,7 @@ export default function Viewer3D({ activePanel, onPanelSelect }: Props) {
   const shadingMode = useViewerStore((s) => s.shadingMode)
   const cameraMode = useViewerStore((s) => s.cameraMode)
   const measureMode = useViewerStore((s) => s.measureMode)
+  const setModelParts = useViewerStore((s) => s.setModelParts)
 
   // Keep refs for use inside effects
   const gridMeshRef = useRef<{ setEnabled: (v: boolean) => void } | null>(null)
@@ -57,6 +58,7 @@ export default function Viewer3D({ activePanel, onPanelSelect }: Props) {
 
     // Load sample geometry immediately
     const samples = loadSampleGeometry(scene)
+    setModelParts(buildPartEntries(samples))
     fitToScene(camera, scene.meshes.slice())
 
     // Cursor tracking
@@ -139,9 +141,11 @@ export default function Viewer3D({ activePanel, onPanelSelect }: Props) {
     try {
       const toRemove = getModelMeshes(sceneRef.current)
       toRemove.forEach((m) => m.dispose())
+      setModelParts([])
       setStepLoadingMsg(`Loading ${file.name}…`)
       const meshes = await loadFile(file, sceneRef.current, () => {})
       setLoadedFileName(file.name)
+      setModelParts(buildPartEntries(meshes))
       applyShadingMode(shadingMode, meshes)
       fitToScene(cameraInternalRef.current, sceneRef.current.meshes.slice())
     } catch (err) {
@@ -167,17 +171,19 @@ export default function Viewer3D({ activePanel, onPanelSelect }: Props) {
       <SelectionController />
       <MeasurementController />
 
-      {/* Floating left column: brand + sidebar */}
+      {/* Floating left column: brand + sidebar + cube */}
       <div className="sidebar-col">
         <BrandWidget />
         <LeftSidebar activePanel={activePanel} onSelect={onPanelSelect} />
+        <div className="sidebar-cube-wrap">
+          <ViewCube />
+        </div>
       </div>
       <RightPanel activePanel={activePanel} />
 
       {/* Overlays */}
       <TopToolbar />
       <MeasurementLabels />
-      <ViewCube />
       <StatusBar loadedFileName={loadedFileName} />
 
       {isDragging && (

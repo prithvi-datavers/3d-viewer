@@ -1,5 +1,6 @@
-import { Trash2, Ruler } from 'lucide-react'
+import { Trash2, Ruler, Eye, EyeOff } from 'lucide-react'
 import { useViewerStore } from '../../store/viewerStore'
+import { selectMesh } from '../../lib/babylon/SelectionManager'
 import type { SidebarPanel } from './LeftSidebar'
 
 interface Props {
@@ -80,15 +81,59 @@ function MeasurePanel() {
   )
 }
 
-/* ── Tree Panel (future) ───────────────────────────── */
+/* ── Tree Panel ────────────────────────────────────── */
 function TreePanel() {
+  const modelParts        = useViewerStore((s) => s.modelParts)
+  const setPartVisibility = useViewerStore((s) => s.setPartVisibility)
+  const babylonScene      = useViewerStore((s) => s.babylonScene)
+  const selectedMeshName  = useViewerStore((s) => s.selectedMeshName)
+  const setSelection      = useViewerStore((s) => s.setSelection)
+
+  const handleSelect = (name: string) => {
+    if (!babylonScene) return
+    const mesh = babylonScene.getMeshByName(name)
+    if (!mesh) return
+    const selInfo = selectMesh(mesh)
+    setSelection(name, selInfo)
+  }
+
+  const toggleVisibility = (name: string, currentVisible: boolean) => {
+    const mesh = babylonScene?.getMeshByName(name)
+    if (mesh) mesh.setEnabled(!currentVisible)
+    setPartVisibility(name, !currentVisible)
+  }
+
   return (
     <>
       <div className="panel-header">
         <span className="panel-header-title">Model Tree</span>
       </div>
       <div className="panel-body">
-        <p className="panel-empty-msg">Assembly tree will appear here when a multi-part STEP file is loaded.</p>
+        {modelParts.length === 0 ? (
+          <p className="panel-empty-msg">No model loaded.</p>
+        ) : (
+          <div className="tree-list">
+            {modelParts.map((part) => (
+              <div
+                key={part.name}
+                className={`tree-item${selectedMeshName === part.name ? ' selected' : ''}${!part.visible ? ' hidden' : ''}`}
+                onClick={() => handleSelect(part.name)}
+              >
+                <span className="tree-item-dot" style={{ background: part.color }} />
+                <span className="tree-item-name">{part.displayName}</span>
+                <button
+                  className="tree-item-eye"
+                  onClick={(e) => { e.stopPropagation(); toggleVisibility(part.name, part.visible) }}
+                  title={part.visible ? 'Hide' : 'Show'}
+                >
+                  {part.visible
+                    ? <Eye size={13} strokeWidth={1.5} />
+                    : <EyeOff size={13} strokeWidth={1.5} />}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </>
   )

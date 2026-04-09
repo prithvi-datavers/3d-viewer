@@ -77,12 +77,17 @@ body {
 .sidebar-col {
   position: absolute;
   top: 12px;
+  bottom: calc(26px + 12px); /* status bar height + gap */
   left: 12px;
   z-index: 15;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  pointer-events: auto;
+  pointer-events: none;
+}
+.sidebar-col > * { pointer-events: auto; }
+.sidebar-cube-wrap {
+  margin-top: auto;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -145,8 +150,7 @@ body {
 .right-panel {
   position: absolute;
   top: 12px;
-  /* sits just left of ViewCube (90px wide + 12px right + 8px gap) */
-  right: calc(90px + 12px + 8px);
+  right: 12px;
   z-index: 14;
   width: 0;
   max-height: calc(100% - 50px);
@@ -219,6 +223,54 @@ body {
   color: var(--text-muted);
   line-height: 1.6;
   padding: 4px 0;
+}
+
+/* ── Model Tree ─────────────────────────────────────── */
+.tree-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.tree-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.tree-item:hover { background: rgba(0, 0, 0, 0.04); }
+.tree-item.selected { background: rgba(0, 212, 255, 0.10); }
+.tree-item.hidden { opacity: 0.4; }
+.tree-item-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.tree-item-name {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tree-item-eye {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.tree-item-eye:hover {
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.06);
 }
 
 /* ── Shading buttons in Display panel ──────────────── */
@@ -453,10 +505,6 @@ body {
    ViewCube (top-right)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .viewcube-widget {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 10;
   pointer-events: auto;
 }
 .viewcube-canvas-wrap {

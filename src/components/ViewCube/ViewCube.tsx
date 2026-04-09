@@ -26,7 +26,7 @@ import type { ViewPreset } from '../../types/viewer'
 /** Face normals in world space (Z-up right-handed) */
 const FACE_DATA = [
   { view: 'TOP'    as ViewPreset, label: 'TOP',   nx:  0, ny:  0, nz:  1 },
-  { view: 'BOTTOM' as ViewPreset, label: 'BTM',   nx:  0, ny:  0, nz: -1 },
+  { view: 'BOTTOM' as ViewPreset, label: 'BOTTOM', nx:  0, ny:  0, nz: -1 },
   { view: 'FRONT'  as ViewPreset, label: 'FRONT', nx:  0, ny: -1, nz:  0 },
   { view: 'BACK'   as ViewPreset, label: 'BACK',  nx:  0, ny:  1, nz:  0 },
   { view: 'RIGHT'  as ViewPreset, label: 'RIGHT', nx:  1, ny:  0, nz:  0 },
@@ -39,17 +39,8 @@ const AXIS_DATA = [
   { label: 'Z', nx: 0, ny: 0, nz: 1, hex: '#4a90d9' },
 ]
 
-/** 12 cube edge vertex-index pairs (cube corners at ±0.5) */
-const C = 0.502  // slightly outside 0.5 so edges win depth over face surfaces
-const CUBE_VERTS = [
-  [-C,-C,-C],[C,-C,-C],[C,C,-C],[-C,C,-C],
-  [-C,-C, C],[C,-C, C],[C,C, C],[-C,C, C],
-].map(([x,y,z]) => new Vector3(x,y,z))
-const EDGE_PAIRS: [number,number][] = [
-  [0,1],[1,2],[2,3],[3,0],
-  [4,5],[5,6],[6,7],[7,4],
-  [0,4],[1,5],[2,6],[3,7],
-]
+const C = 0.502  // cube half-extent — slightly outside 0.5 so edges win depth over face surfaces
+const EDGE_T = 0.016  // edge box thickness
 
 // ── Rotation for face planes ───────────────────────────────────────────────────
 // A Babylon CreatePlane lies in the local XY plane; its normal points +Z local.
@@ -72,7 +63,7 @@ function makeFaceTex(label: string, scene: Scene): DynamicTexture {
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, 256, 256)
   ctx.fillStyle = '#000000'
-  ctx.font = `bold ${label.length >= 5 ? 34 : 46}px Arial, sans-serif`
+  ctx.font = 'bold 34px Arial, sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(label, 128, 128)
@@ -173,19 +164,32 @@ export default function ViewCube() {
     })
 
     // ── Group 1: cube edges ───────────────────────────────────────────────────
-    // Vertices scaled to 0.502 so they sit just outside the body surface.
-    // Rendering group 1 inherits depth from group 0:
+    // Thin box meshes instead of line primitives — solid geometry, no WebGL
+    // line aliasing. Rendering group 1 inherits depth from group 0:
     //   → no z-fighting with face planes
     //   → back-side edges naturally hidden by body depth buffer
-    const edgeColor = new Color4(0.25, 0.25, 0.30, 0.55)
-    EDGE_PAIRS.forEach(([a, b], i) => {
-      const ln = MeshBuilder.CreateLines(`e${i}`, {
-        points: [CUBE_VERTS[a], CUBE_VERTS[b]],
-        colors: [edgeColor, edgeColor],
-      }, scene)
-      ln.isPickable = false
-      ln.renderingGroupId = 1
-    })
+    const edgeMat = new StandardMaterial('edgeMat', scene)
+    edgeMat.emissiveColor = new Color3(0.25, 0.25, 0.30)
+    edgeMat.disableLighting = true
+    edgeMat.backFaceCulling = true
+    edgeMat.alpha = 0.75
+
+    const EL = 2 * C + EDGE_T  // length (slightly longer so corners are filled)
+    const T  = EDGE_T
+    let ei = 0
+    const makeEdge = (w: number, h: number, d: number, px: number, py: number, pz: number) => {
+      const e = MeshBuilder.CreateBox(`edge_${ei++}`, { width: w, height: h, depth: d }, scene)
+      e.position   = new Vector3(px, py, pz)
+      e.material   = edgeMat
+      e.isPickable = false
+      e.renderingGroupId = 1
+    }
+    // 4 edges along X (at each Y=±C, Z=±C corner)
+    for (const py of [-C, C]) for (const pz of [-C, C]) makeEdge(EL, T, T, 0, py, pz)
+    // 4 edges along Y (at each X=±C, Z=±C corner)
+    for (const px of [-C, C]) for (const pz of [-C, C]) makeEdge(T, EL, T, px, 0, pz)
+    // 4 edges along Z (at each X=±C, Y=±C corner)
+    for (const px of [-C, C]) for (const py of [-C, C]) makeEdge(T, T, EL, px, py, 0)
 
     // ── Group 2: axis lines ───────────────────────────────────────────────────
     // Depth cleared → always visible through the opaque cube body.

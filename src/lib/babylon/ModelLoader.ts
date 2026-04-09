@@ -1,6 +1,35 @@
 import type { Scene, AbstractMesh } from '@babylonjs/core'
 import { SceneLoader, MeshBuilder, PBRMaterial, Color3, Vector3 } from '@babylonjs/core'
 import { loadSTEP, type StepProgressCallback } from './StepLoader'
+import type { PartEntry } from '../../types/viewer'
+
+// ── Part entry helpers ────────────────────────────────────────────────────────
+
+function getDisplayName(meshName: string, idx: number): string {
+  if (meshName.startsWith('StepPart_')) return `Part ${idx + 1}`
+  if (meshName === 'sampleBox')    return 'Box'
+  if (meshName === 'sampleSphere') return 'Sphere'
+  if (meshName === 'sampleCyl')    return 'Cylinder'
+  return meshName.length > 22 ? meshName.slice(0, 20) + '…' : meshName
+}
+
+function getMeshColor(mesh: AbstractMesh): string {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mat = mesh.material as any
+  const raw = mat?.albedoColor ?? mat?.diffuseColor
+  if (!raw) return '#9aa0b0'
+  const h = (v: number) => Math.round(Math.max(0, Math.min(1, v)) * 255).toString(16).padStart(2, '0')
+  return `#${h(raw.r)}${h(raw.g)}${h(raw.b)}`
+}
+
+export function buildPartEntries(meshes: AbstractMesh[]): PartEntry[] {
+  return meshes.map((mesh, i) => ({
+    name: mesh.name,
+    displayName: getDisplayName(mesh.name, i),
+    color: getMeshColor(mesh),
+    visible: true,
+  }))
+}
 
 export async function loadFile(
   file: File,

@@ -54,7 +54,7 @@ export function applyShadingMode(mode: ShadingMode, meshes: AbstractMesh[]) {
         mat.backFaceCulling = mat.metadata._orig.backFaceCulling
         if (mat.roughness !== undefined) mat.roughness = mat.metadata._orig.roughness
         if (mat.metallic !== undefined) mat.metallic = mat.metadata._orig.metallic
-        mesh.enableEdgesRendering()
+        mesh.enableEdgesRendering(0.85)
         mesh.edgesWidth = 1.5
         mesh.edgesColor = new Color4(0, 0, 0, 0.6)
         break
