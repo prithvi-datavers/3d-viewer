@@ -93,10 +93,10 @@ function makeBadgeTex(label: string, hex: string, scene: Scene): DynamicTexture 
   ctx.fill()
   // White letter
   ctx.fillStyle = '#ffffff'
-  ctx.font = 'bold 72px Arial, sans-serif'
+  ctx.font = 'bold 54px Arial, sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText(label, 64, 66)
+  ctx.fillText(label, 64, 65)
   tex.update()
   tex.hasAlpha = true
   return tex
@@ -233,7 +233,7 @@ export default function ViewCube() {
 
     AXIS_DATA.forEach((ax) => {
       const dir   = new Vector3(ax.nx, ax.ny, ax.nz)
-      const badge = MeshBuilder.CreatePlane(`bd_${ax.label}`, { size: 0.25 }, scene)
+      const badge = MeshBuilder.CreatePlane(`bd_${ax.label}`, { size: 0.32 }, scene)
       badge.position      = dir.scale(0.72)
       badge.billboardMode = 7  // BILLBOARDMODE_ALL
       badge.isPickable    = false
