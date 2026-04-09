@@ -148,18 +148,23 @@ export default function ViewCube() {
     })
 
     // ── Axis lines: inside subtle, outside bold ───────────────────────────
+    // renderingGroupId=1 so lines draw on top of the opaque cube body (group 0)
     AXIS_DEFS.forEach((ax) => {
       const c = Color3.FromHexString(ax.hex)
-      // Inside: origin → face (subtle)
-      MeshBuilder.CreateLines(`axIn_${ax.label}`, {
+      // Inside: origin → face (subtle, rendered through cube)
+      const inner = MeshBuilder.CreateLines(`axIn_${ax.label}`, {
         points: [Vector3.Zero(), ax.inner],
-        colors: [new Color4(c.r, c.g, c.b, 0.15), new Color4(c.r, c.g, c.b, 0.30)],
-      }, scene).isPickable = false
+        colors: [new Color4(c.r, c.g, c.b, 0.30), new Color4(c.r, c.g, c.b, 0.55)],
+      }, scene)
+      inner.isPickable = false
+      inner.renderingGroupId = 1
       // Outside: face → badge (bold)
-      MeshBuilder.CreateLines(`axOut_${ax.label}`, {
+      const outer = MeshBuilder.CreateLines(`axOut_${ax.label}`, {
         points: [ax.inner, ax.outer],
         colors: [new Color4(c.r, c.g, c.b, 0.65), new Color4(c.r, c.g, c.b, 1.0)],
-      }, scene).isPickable = false
+      }, scene)
+      outer.isPickable = false
+      outer.renderingGroupId = 1
     })
 
     // ── Axis badge planes (billboarded, colored circle + white letter) ────
@@ -173,8 +178,9 @@ export default function ViewCube() {
       mat.emissiveColor   = new Color3(1, 1, 1)
       mat.specularColor   = new Color3(0, 0, 0)
       mat.backFaceCulling = false
-      badge.material   = mat
-      badge.isPickable = false
+      badge.material        = mat
+      badge.isPickable      = false
+      badge.renderingGroupId = 1
     })
 
     // ── Click → animate main camera ───────────────────────────────────────
