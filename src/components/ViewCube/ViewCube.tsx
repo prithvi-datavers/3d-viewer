@@ -175,6 +175,8 @@ export default function ViewCube() {
     })
 
     // ── Axis badge planes (billboarded, colored circle + white letter) ────
+    // Store badge meshes + their direction for per-frame alpha update
+    const badgeMeshes: { dir: Vector3; mat: StandardMaterial }[] = []
     AXIS_DEFS.forEach((ax) => {
       const badge = MeshBuilder.CreatePlane(`badge_${ax.label}`, { size: 0.26 }, scene)
       badge.position = ax.outer.clone()
@@ -184,11 +186,11 @@ export default function ViewCube() {
       mat.useAlphaFromDiffuseTexture = true
       mat.emissiveColor   = new Color3(1, 1, 1)
       mat.specularColor   = new Color3(0, 0, 0)
-      mat.alpha           = 0.35
       mat.backFaceCulling = false
       badge.material        = mat
       badge.isPickable      = false
       badge.renderingGroupId = 2
+      badgeMeshes.push({ dir: ax.outer.normalizeToNew(), mat })
     })
 
     // ── Click → animate main camera ───────────────────────────────────────
@@ -203,6 +205,16 @@ export default function ViewCube() {
       if (mc && cubeCamRef.current) {
         cubeCamRef.current.alpha = mc.alpha
         cubeCamRef.current.beta  = mc.beta
+      }
+      // Per-frame: set badge alpha based on dot with camera forward direction
+      if (cubeCamRef.current) {
+        const cam = cubeCamRef.current
+        const camDir = cam.target.subtract(cam.position).normalize()
+        badgeMeshes.forEach(({ dir, mat }) => {
+          const dot = Vector3.Dot(dir, camDir)
+          // dot > 0 means badge faces camera → full; dot < 0 → back → dim
+          mat.alpha = dot >= 0 ? 1.0 : 0.28
+        })
       }
       scene.render()
     })
