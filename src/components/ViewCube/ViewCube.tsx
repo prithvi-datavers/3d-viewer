@@ -34,9 +34,7 @@ function makeFaceTex(label: string, scene: Scene): DynamicTexture {
   const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
   ctx.fillStyle = '#f7f7fa'
   ctx.fillRect(0, 0, 256, 256)
-  ctx.strokeStyle = 'rgba(0,0,0,0.14)'
-  ctx.lineWidth = 4
-  ctx.strokeRect(2, 2, 252, 252)
+  // No border stroke — cube body edge lines define the outline
   const fontSize = label.length >= 5 ? 40 : 50
   ctx.fillStyle = '#111111'
   ctx.font = `bold ${fontSize}px Arial, sans-serif`
@@ -118,7 +116,7 @@ export default function ViewCube() {
 
     // ── Face planes at ±0.501 (0.001 above cube surface, sub-pixel) ───────
     FACE_DEFS.forEach((def) => {
-      const plane = MeshBuilder.CreatePlane(`face_${def.name}`, { size: 1.0 }, scene)
+      const plane = MeshBuilder.CreatePlane(`face_${def.name}`, { size: 0.98 }, scene)
       plane.position = new Vector3(...def.pos)
       plane.rotation = new Vector3(...def.rot)
       const mat = new StandardMaterial(`faceMat_${def.name}`, scene)
