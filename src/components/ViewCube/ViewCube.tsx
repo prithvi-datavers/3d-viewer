@@ -69,12 +69,10 @@ function faceEuler(nx: number, ny: number, nz: number): Vector3 {
 function makeFaceTex(label: string, scene: Scene): DynamicTexture {
   const tex = new DynamicTexture(`ft_${label}`, { width: 256, height: 256 }, scene, false)
   const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
-  // White background
-  ctx.fillStyle = '#f8f8fc'
+  ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, 256, 256)
-  // Bold black label
-  ctx.fillStyle = '#1a1a2e'
-  ctx.font = `bold ${label.length >= 5 ? 40 : 52}px Arial, sans-serif`
+  ctx.fillStyle = '#000000'
+  ctx.font = `bold ${label.length >= 5 ? 42 : 54}px Arial, sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(label, 128, 128)
@@ -166,8 +164,10 @@ export default function ViewCube() {
       plane.position = new Vector3(f.nx, f.ny, f.nz).scaleInPlace(0.501)
       plane.rotation = faceEuler(f.nx, f.ny, f.nz)
       const mat = new StandardMaterial(`fm_${f.view}`, scene)
+      mat.diffuseColor     = new Color3(0, 0, 0)   // no diffuse lighting contribution
       mat.emissiveTexture  = makeFaceTex(f.label, scene)
-      mat.emissiveColor    = new Color3(1, 1, 1)  // pass texture through unchanged
+      mat.emissiveColor    = new Color3(1, 1, 1)
+      mat.specularColor    = new Color3(0, 0, 0)
       mat.disableLighting  = true
       mat.backFaceCulling  = true
       plane.material = mat
