@@ -44,7 +44,7 @@ function addEdgeLines(mesh: AbstractMesh) {
 
   // Build line segments
   const wm = mesh.getWorldMatrix()
-  const edgeColor = new Color4(0.05, 0.05, 0.08, 0.55)
+  const edgeColor = new Color4(0.05, 0.05, 0.08, 0.18)
   const lines = edgeList.map(([a, b]) => {
     const pa = new Vector3(positions[a * 3], positions[a * 3 + 1], positions[a * 3 + 2])
     const pb = new Vector3(positions[b * 3], positions[b * 3 + 1], positions[b * 3 + 2])
