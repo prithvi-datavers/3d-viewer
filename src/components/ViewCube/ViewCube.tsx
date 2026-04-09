@@ -169,7 +169,7 @@ export default function ViewCube() {
       mat.emissiveColor    = new Color3(1, 1, 1)
       mat.specularColor    = new Color3(0, 0, 0)
       mat.disableLighting  = true
-      mat.backFaceCulling  = true
+      mat.backFaceCulling  = false  // solid body occludes inner face; show both sides
       plane.material = mat
       plane.metadata = { viewName: f.view }
       plane.renderingGroupId = 0
