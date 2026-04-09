@@ -111,7 +111,6 @@ export default function ViewCube() {
     const boxMat = new StandardMaterial('cubeBodyMat', scene)
     boxMat.emissiveColor  = new Color3(0.96, 0.96, 0.98)
     boxMat.disableLighting = true
-    boxMat.alpha = 0.35
     box.material   = boxMat
     box.isPickable = false
 
@@ -123,7 +122,6 @@ export default function ViewCube() {
       const mat = new StandardMaterial(`faceMat_${def.name}`, scene)
       mat.emissiveTexture = makeFaceTex(FACE_LABELS[def.name], scene)
       mat.disableLighting = true
-      mat.alpha = 0.88
       mat.backFaceCulling = true
       plane.material = mat
       plane.metadata = { viewName: def.name }
