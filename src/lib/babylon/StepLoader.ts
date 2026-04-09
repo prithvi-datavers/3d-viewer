@@ -52,16 +52,13 @@ export async function loadSTEP(
   onProgress: StepProgressCallback = () => {}
 ): Promise<AbstractMesh[]> {
   // Read file bytes
-  onProgress('Reading file...')
   const buffer = await file.arrayBuffer()
   const fileBytes = new Uint8Array(buffer)
 
-  // Init WASM (lazy, singleton)
-  onProgress('Initializing OpenCASCADE WASM...')
+  // Init WASM (lazy, singleton) — no progress update, keep caller's message
   const oc = await getOC()
 
   // Write to Emscripten virtual FS
-  onProgress('Parsing STEP geometry...')
   const fileName = '/model.step'
 
   // Remove existing file if present
@@ -85,12 +82,8 @@ export async function loadSTEP(
     try { oc.FS.unlink(fileName) } catch (_) {}
   }
 
-  // Tessellate
-  onProgress('Tessellating surfaces...')
+  // Tessellate + build meshes (keep caller's loading message)
   new oc.BRepMesh_IncrementalMesh_2(shape, 0.1, false, 0.5, false)
-
-  // Build meshes
-  onProgress('Building 3D meshes...')
   const meshes = buildMeshes(oc, scene, shape)
 
   shape.delete()

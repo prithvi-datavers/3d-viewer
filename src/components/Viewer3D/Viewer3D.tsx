@@ -139,7 +139,8 @@ export default function Viewer3D({ activePanel, onPanelSelect }: Props) {
     try {
       const toRemove = getModelMeshes(sceneRef.current)
       toRemove.forEach((m) => m.dispose())
-      const meshes = await loadFile(file, sceneRef.current, (msg) => setStepLoadingMsg(msg || null))
+      setStepLoadingMsg(`Loading ${file.name}…`)
+      const meshes = await loadFile(file, sceneRef.current, () => {})
       setLoadedFileName(file.name)
       applyShadingMode(shadingMode, meshes)
       fitToScene(cameraInternalRef.current, sceneRef.current.meshes.slice())

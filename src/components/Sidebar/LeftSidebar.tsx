@@ -31,7 +31,8 @@ export default function LeftSidebar({ activePanel, onSelect }: Props) {
     if (!file || !babylonScene || !cameraRef) return
     getModelMeshes(babylonScene).forEach((m) => m.dispose())
     try {
-      const meshes = await loadFile(file, babylonScene, (msg) => setLoadingMsg(msg || null))
+      setLoadingMsg(`Loading ${file.name}…`)
+      const meshes = await loadFile(file, babylonScene, () => {})
       applyShadingMode(shadingMode, meshes)
       fitToScene(cameraRef, babylonScene.meshes.slice())
       setLoadedFileName(file.name)
