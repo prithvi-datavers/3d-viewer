@@ -126,7 +126,6 @@ export default function ViewCube() {
       const mat = new StandardMaterial(`faceMat_${def.name}`, scene)
       mat.emissiveTexture = makeFaceTex(FACE_LABELS[def.name], scene)
       mat.disableLighting = true
-      mat.alpha = 0.82
       mat.backFaceCulling = true
       plane.material = mat
       plane.metadata = { viewName: def.name }
@@ -160,10 +159,10 @@ export default function ViewCube() {
       // Inside: origin → face (subtle, rendered through cube)
       const inner = MeshBuilder.CreateLines(`axIn_${ax.label}`, {
         points: [Vector3.Zero(), ax.inner],
-        colors: [new Color4(c.r, c.g, c.b, 0.40), new Color4(c.r, c.g, c.b, 0.65)],
+        colors: [new Color4(c.r, c.g, c.b, 0.18), new Color4(c.r, c.g, c.b, 0.30)],
       }, scene)
       inner.isPickable = false
-      // group 0: depth-composited behind semi-transparent face planes = tinted look
+      inner.renderingGroupId = 2
       // Outside: face → badge (bold)
       const outer = MeshBuilder.CreateLines(`axOut_${ax.label}`, {
         points: [ax.inner, ax.outer],
