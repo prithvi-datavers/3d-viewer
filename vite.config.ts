@@ -22,6 +22,9 @@ export default defineConfig({
       stream: emptyStub,
     },
   },
+  worker: {
+    format: 'es',
+  },
   optimizeDeps: {
     exclude: ['opencascade.js'],
   },
