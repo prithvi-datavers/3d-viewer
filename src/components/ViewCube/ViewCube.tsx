@@ -145,6 +145,7 @@ export default function ViewCube() {
         colors: [ec, ec],
       }, scene)
       ln.isPickable = false
+      ln.renderingGroupId = 1
     })
 
     // ── Axis lines: inside subtle, outside bold ───────────────────────────
