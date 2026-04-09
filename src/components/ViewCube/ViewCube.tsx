@@ -127,10 +127,25 @@ export default function ViewCube() {
       plane.metadata = { viewName: def.name }
     })
 
-    // ── Cube edge lines via enableEdgesRendering ──────────────────────────
-    box.enableEdgesRendering()
-    box.edgesWidth = 3.5
-    box.edgesColor = new Color4(0.08, 0.08, 0.12, 1)
+    // ── 12 explicit edge lines — always solid at every angle ─────────────
+    const h = 0.5
+    const corners: [number,number,number][] = [
+      [-h,-h,-h],[h,-h,-h],[h,h,-h],[-h,h,-h],
+      [-h,-h, h],[h,-h, h],[h,h, h],[-h,h, h],
+    ]
+    const edgePairs: [number,number][] = [
+      [0,1],[1,2],[2,3],[3,0],
+      [4,5],[5,6],[6,7],[7,4],
+      [0,4],[1,5],[2,6],[3,7],
+    ]
+    const ec = new Color4(0.05, 0.05, 0.08, 1)
+    edgePairs.forEach(([a, b], i) => {
+      const ln = MeshBuilder.CreateLines(`edge_${i}`, {
+        points: [new Vector3(...corners[a]), new Vector3(...corners[b])],
+        colors: [ec, ec],
+      }, scene)
+      ln.isPickable = false
+    })
 
     // ── Axis lines: inside subtle, outside bold ───────────────────────────
     AXIS_DEFS.forEach((ax) => {
