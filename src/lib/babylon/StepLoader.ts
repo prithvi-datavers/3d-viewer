@@ -52,7 +52,9 @@ function buildMeshes(scene: Scene, parts: StepPart[]): AbstractMesh[] {
 
   parts.forEach((part, idx) => {
     if (part.positions.length === 0) return
-    const mesh = new Mesh(`StepPart_${idx}`, scene)
+    // Use the name from the STEP product structure (or a safe fallback)
+    const safeName = part.name.replace(/[^a-zA-Z0-9_\- ]/g, '_').trim() || `Part_${idx + 1}`
+    const mesh = new Mesh(safeName, scene)
     const vd = new VertexData()
     vd.positions = part.positions
     vd.normals   = part.normals

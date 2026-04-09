@@ -5,8 +5,7 @@ import type { PartEntry } from '../../types/viewer'
 
 // ── Part entry helpers ────────────────────────────────────────────────────────
 
-function getDisplayName(meshName: string, idx: number): string {
-  if (meshName.startsWith('StepPart_')) return `Part ${idx + 1}`
+function getDisplayName(meshName: string): string {
   if (meshName === 'sampleBox')    return 'Box'
   if (meshName === 'sampleSphere') return 'Sphere'
   if (meshName === 'sampleCyl')    return 'Cylinder'
@@ -23,9 +22,9 @@ function getMeshColor(mesh: AbstractMesh): string {
 }
 
 export function buildPartEntries(meshes: AbstractMesh[]): PartEntry[] {
-  return meshes.map((mesh, i) => ({
+  return meshes.map((mesh) => ({
     name: mesh.name,
-    displayName: getDisplayName(mesh.name, i),
+    displayName: getDisplayName(mesh.name),
     color: getMeshColor(mesh),
     visible: true,
   }))
