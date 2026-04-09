@@ -140,7 +140,7 @@ export default function ViewCube() {
       [4,5],[5,6],[6,7],[7,4],
       [0,4],[1,5],[2,6],[3,7],
     ]
-    const ec = new Color4(0.05, 0.05, 0.08, 0.55)
+    const ec = new Color4(0.15, 0.15, 0.20, 0.18)
     edgePairs.forEach(([a, b], i) => {
       const ln = MeshBuilder.CreateLines(`edge_${i}`, {
         points: [new Vector3(...corners[a]), new Vector3(...corners[b])],
