@@ -121,9 +121,8 @@ export default function ViewCube() {
       plane.position = new Vector3(...def.pos)
       plane.rotation = new Vector3(...def.rot)
       const mat = new StandardMaterial(`faceMat_${def.name}`, scene)
-      mat.diffuseTexture = makeFaceTex(FACE_LABELS[def.name], scene)
-      mat.specularColor  = new Color3(0, 0, 0)
-      mat.emissiveColor  = new Color3(0.1, 0.1, 0.1)
+      mat.emissiveTexture = makeFaceTex(FACE_LABELS[def.name], scene)
+      mat.disableLighting = true
       mat.backFaceCulling = true
       plane.material = mat
       plane.metadata = { viewName: def.name }
