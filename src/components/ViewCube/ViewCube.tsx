@@ -87,8 +87,10 @@ export default function ViewCube() {
 
     scene.useRightHandedSystem = true
     scene.clearColor = new Color4(0, 0, 0, 0)
-    // Group 1 keeps the depth buffer from group 0 — back edges are hidden naturally
+    // Group 1: preserves depth from group 0 (edges: no z-fight, back edges hidden)
     scene.setRenderingAutoClearDepthStencil(1, false)
+    // Group 2: clears depth (axes + badges always visible through cube body)
+    scene.setRenderingAutoClearDepthStencil(2, true)
 
     // Orthographic camera
     const camera = new ArcRotateCamera('cubeCamera', -Math.PI / 4, Math.PI / 3, 2.8, Vector3.Zero(), scene)
@@ -140,7 +142,7 @@ export default function ViewCube() {
       [4,5],[5,6],[6,7],[7,4],
       [0,4],[1,5],[2,6],[3,7],
     ]
-    const ec = new Color4(0.05, 0.05, 0.08, 0.18)
+    const ec = new Color4(0.45, 0.45, 0.50, 0.55)
     edgePairs.forEach(([a, b], i) => {
       const ln = MeshBuilder.CreateLines(`edge_${i}`, {
         points: [new Vector3(...corners[a]), new Vector3(...corners[b])],
@@ -160,14 +162,14 @@ export default function ViewCube() {
         colors: [new Color4(c.r, c.g, c.b, 0.30), new Color4(c.r, c.g, c.b, 0.55)],
       }, scene)
       inner.isPickable = false
-      inner.renderingGroupId = 1
+      inner.renderingGroupId = 2
       // Outside: face → badge (bold)
       const outer = MeshBuilder.CreateLines(`axOut_${ax.label}`, {
         points: [ax.inner, ax.outer],
         colors: [new Color4(c.r, c.g, c.b, 0.65), new Color4(c.r, c.g, c.b, 1.0)],
       }, scene)
       outer.isPickable = false
-      outer.renderingGroupId = 1
+      outer.renderingGroupId = 2
     })
 
     // ── Axis badge planes (billboarded, colored circle + white letter) ────
@@ -183,7 +185,7 @@ export default function ViewCube() {
       mat.backFaceCulling = false
       badge.material        = mat
       badge.isPickable      = false
-      badge.renderingGroupId = 1
+      badge.renderingGroupId = 2
     })
 
     // ── Click → animate main camera ───────────────────────────────────────
