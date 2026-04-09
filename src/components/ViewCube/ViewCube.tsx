@@ -109,9 +109,8 @@ export default function ViewCube() {
     // ── Solid opaque cube body — fills interior so back planes never show ─
     const box = MeshBuilder.CreateBox('cubeBody', { size: 1 }, scene)
     const boxMat = new StandardMaterial('cubeBodyMat', scene)
-    boxMat.diffuseColor  = new Color3(0.96, 0.96, 0.98)
-    boxMat.specularColor = new Color3(0.05, 0.05, 0.06)
-    boxMat.specularPower = 16
+    boxMat.emissiveColor  = new Color3(0.96, 0.96, 0.98)
+    boxMat.disableLighting = true
     box.material   = boxMat
     box.isPickable = false
 
