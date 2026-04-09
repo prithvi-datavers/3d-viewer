@@ -111,6 +111,7 @@ export default function ViewCube() {
     const boxMat = new StandardMaterial('cubeBodyMat', scene)
     boxMat.emissiveColor  = new Color3(0.96, 0.96, 0.98)
     boxMat.disableLighting = true
+    boxMat.alpha = 0.18
     box.material   = boxMat
     box.isPickable = false
 
@@ -122,6 +123,7 @@ export default function ViewCube() {
       const mat = new StandardMaterial(`faceMat_${def.name}`, scene)
       mat.emissiveTexture = makeFaceTex(FACE_LABELS[def.name], scene)
       mat.disableLighting = true
+      mat.alpha = 0.72
       mat.backFaceCulling = true
       plane.material = mat
       plane.metadata = { viewName: def.name }
@@ -138,7 +140,7 @@ export default function ViewCube() {
       [4,5],[5,6],[6,7],[7,4],
       [0,4],[1,5],[2,6],[3,7],
     ]
-    const ec = new Color4(0.05, 0.05, 0.08, 1)
+    const ec = new Color4(0.05, 0.05, 0.08, 0.45)
     edgePairs.forEach(([a, b], i) => {
       const ln = MeshBuilder.CreateLines(`edge_${i}`, {
         points: [new Vector3(...corners[a]), new Vector3(...corners[b])],
