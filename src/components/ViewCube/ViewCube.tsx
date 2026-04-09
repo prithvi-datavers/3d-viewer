@@ -187,7 +187,7 @@ export default function ViewCube() {
       mat.backFaceCulling = false
       badge.material        = mat
       badge.isPickable      = false
-      badge.renderingGroupId = 2
+      badge.renderingGroupId = 1  // depth-tested: far-side badges hidden by cube body
     })
 
     // ── Click → animate main camera ───────────────────────────────────────
