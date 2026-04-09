@@ -184,10 +184,11 @@ export default function ViewCube() {
       mat.useAlphaFromDiffuseTexture = true
       mat.emissiveColor   = new Color3(1, 1, 1)
       mat.specularColor   = new Color3(0, 0, 0)
+      mat.alpha           = 0.35
       mat.backFaceCulling = false
       badge.material        = mat
       badge.isPickable      = false
-      badge.renderingGroupId = 1  // depth-tested: far-side badges hidden by cube body
+      badge.renderingGroupId = 2
     })
 
     // ── Click → animate main camera ───────────────────────────────────────
