@@ -8,31 +8,19 @@ import { useViewerStore } from '../../store/viewerStore'
 import { animateToView, VIEWS } from '../../lib/babylon/CameraManager'
 import type { ViewPreset } from '../../types/viewer'
 
-// Face planes at exactly ±0.5 — same UV as before (no mirroring)
+// Face planes at ±0.501 — just outside the solid cube body (0.001 sub-pixel offset)
 const FACE_DEFS = [
-  { name: 'FRONT',  pos: [0, -0.5, 0]  as [number,number,number], rot: [ Math.PI/2, 0, 0]       as [number,number,number] },
-  { name: 'BACK',   pos: [0,  0.5, 0]  as [number,number,number], rot: [-Math.PI/2, 0, Math.PI] as [number,number,number] },
-  { name: 'RIGHT',  pos: [0.5,  0, 0]  as [number,number,number], rot: [0, 0, -Math.PI/2]       as [number,number,number] },
-  { name: 'LEFT',   pos: [-0.5, 0, 0]  as [number,number,number], rot: [0, 0,  Math.PI/2]       as [number,number,number] },
-  { name: 'TOP',    pos: [0, 0,  0.5]  as [number,number,number], rot: [0, 0, 0]                as [number,number,number] },
-  { name: 'BOTTOM', pos: [0, 0, -0.5]  as [number,number,number], rot: [Math.PI, 0, 0]          as [number,number,number] },
+  { name: 'FRONT',  pos: [0, -0.501, 0]  as [number,number,number], rot: [ Math.PI/2, 0, 0]       as [number,number,number] },
+  { name: 'BACK',   pos: [0,  0.501, 0]  as [number,number,number], rot: [-Math.PI/2, 0, Math.PI] as [number,number,number] },
+  { name: 'RIGHT',  pos: [0.501,  0, 0]  as [number,number,number], rot: [0, 0, -Math.PI/2]       as [number,number,number] },
+  { name: 'LEFT',   pos: [-0.501, 0, 0]  as [number,number,number], rot: [0, 0,  Math.PI/2]       as [number,number,number] },
+  { name: 'TOP',    pos: [0, 0,  0.501]  as [number,number,number], rot: [0, 0, 0]                as [number,number,number] },
+  { name: 'BOTTOM', pos: [0, 0, -0.501]  as [number,number,number], rot: [Math.PI, 0, 0]          as [number,number,number] },
 ]
 
 const FACE_LABELS: Record<string, string> = {
   FRONT: 'FRONT', BACK: 'BACK', RIGHT: 'RIGHT', LEFT: 'LEFT', TOP: 'TOP', BOTTOM: 'BTM',
 }
-
-// 8 cube corners for edge lines
-const s = 0.5
-const CORNERS: [number,number,number][] = [
-  [-s,-s,-s],[s,-s,-s],[s,s,-s],[-s,s,-s],
-  [-s,-s, s],[s,-s, s],[s,s, s],[-s,s, s],
-]
-const EDGE_PAIRS: [number,number][] = [
-  [0,1],[1,2],[2,3],[3,0],  // bottom ring
-  [4,5],[5,6],[6,7],[7,4],  // top ring
-  [0,4],[1,5],[2,6],[3,7],  // verticals
-]
 
 // Axis: inner = at face, outer = badge position
 const AXIS_DEFS = [
@@ -119,7 +107,16 @@ export default function ViewCube() {
     const dir = new DirectionalLight('d', new Vector3(-1, -0.5, -1).normalize(), scene)
     dir.intensity = 0.2
 
-    // ── Face planes at exactly ±0.5 (no protrusion) ──────────────────────
+    // ── Solid opaque cube body — fills interior so back planes never show ─
+    const box = MeshBuilder.CreateBox('cubeBody', { size: 1 }, scene)
+    const boxMat = new StandardMaterial('cubeBodyMat', scene)
+    boxMat.diffuseColor  = new Color3(0.96, 0.96, 0.98)
+    boxMat.specularColor = new Color3(0.05, 0.05, 0.06)
+    boxMat.specularPower = 16
+    box.material   = boxMat
+    box.isPickable = false
+
+    // ── Face planes at ±0.501 (0.001 above cube surface, sub-pixel) ───────
     FACE_DEFS.forEach((def) => {
       const plane = MeshBuilder.CreatePlane(`face_${def.name}`, { size: 1.0 }, scene)
       plane.position = new Vector3(...def.pos)
@@ -133,15 +130,10 @@ export default function ViewCube() {
       plane.metadata = { viewName: def.name }
     })
 
-    // ── 12 cube edge lines ────────────────────────────────────────────────
-    const edgeColor = new Color4(0.1, 0.1, 0.14, 1.0)
-    EDGE_PAIRS.forEach(([a, b], i) => {
-      const line = MeshBuilder.CreateLines(`edge_${i}`, {
-        points: [new Vector3(...CORNERS[a]), new Vector3(...CORNERS[b])],
-        colors: [edgeColor, edgeColor],
-      }, scene)
-      line.isPickable = false
-    })
+    // ── Cube edge lines via enableEdgesRendering ──────────────────────────
+    box.enableEdgesRendering()
+    box.edgesWidth = 3.5
+    box.edgesColor = new Color4(0.08, 0.08, 0.12, 1)
 
     // ── Axis lines: inside subtle, outside bold ───────────────────────────
     AXIS_DEFS.forEach((ax) => {
