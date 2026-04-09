@@ -180,7 +180,7 @@ export default function ViewCube() {
     // Rendering group 1 inherits depth from group 0:
     //   → no z-fighting with face planes
     //   → back-side edges naturally hidden by body depth buffer
-    const edgeColor = new Color4(0.30, 0.30, 0.38, 0.50)
+    const edgeColor = new Color4(0.25, 0.25, 0.30, 0.55)
     EDGE_PAIRS.forEach(([a, b], i) => {
       const ln = MeshBuilder.CreateLines(`e${i}`, {
         points: [CUBE_VERTS[a], CUBE_VERTS[b]],

@@ -56,7 +56,7 @@ export function applyShadingMode(mode: ShadingMode, meshes: AbstractMesh[]) {
         if (mat.metallic !== undefined) mat.metallic = mat.metadata._orig.metallic
         mesh.enableEdgesRendering()
         mesh.edgesWidth = 1.5
-        mesh.edgesColor = new Color4(0, 0, 0, 0.6)
+        mesh.edgesColor = new Color4(0.25, 0.25, 0.30, 0.55)
         break
     }
   })
