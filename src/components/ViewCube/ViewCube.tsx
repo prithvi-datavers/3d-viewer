@@ -156,10 +156,12 @@ export default function ViewCube() {
     // renderingGroupId=1 so lines draw on top of the opaque cube body (group 0)
     AXIS_DEFS.forEach((ax) => {
       const c = Color3.FromHexString(ax.hex)
-      // Inside: origin → face (subtle, rendered through cube)
+      // Inside: color blended 65% toward white to simulate seen-through white face
+      const w = 0.65
+      const ci = new Color4(c.r + (1-c.r)*w, c.g + (1-c.g)*w, c.b + (1-c.b)*w, 0.55)
       const inner = MeshBuilder.CreateLines(`axIn_${ax.label}`, {
         points: [Vector3.Zero(), ax.inner],
-        colors: [new Color4(c.r, c.g, c.b, 0.18), new Color4(c.r, c.g, c.b, 0.30)],
+        colors: [new Color4(ci.r, ci.g, ci.b, 0.30), ci],
       }, scene)
       inner.isPickable = false
       inner.renderingGroupId = 2
