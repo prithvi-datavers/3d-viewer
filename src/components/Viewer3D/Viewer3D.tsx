@@ -14,6 +14,7 @@ import TopToolbar from '../Toolbar/TopToolbar'
 import LeftSidebar from '../Sidebar/LeftSidebar'
 import RightPanel from '../Sidebar/RightPanel'
 import BrandWidget from '../TopBar/BrandWidget'
+import ViewCube from '../ViewCube/ViewCube'
 import type { SidebarPanel } from '../Sidebar/LeftSidebar'
 
 interface Props {
@@ -175,6 +176,7 @@ export default function Viewer3D({ activePanel, onPanelSelect }: Props) {
       {/* Overlays */}
       <TopToolbar />
       <MeasurementLabels />
+      <ViewCube />
       <StatusBar loadedFileName={loadedFileName} />
 
       {isDragging && (
