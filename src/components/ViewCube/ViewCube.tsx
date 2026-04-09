@@ -87,6 +87,8 @@ export default function ViewCube() {
 
     scene.useRightHandedSystem = true
     scene.clearColor = new Color4(0, 0, 0, 0)
+    // Group 1 keeps the depth buffer from group 0 — back edges are hidden naturally
+    scene.setRenderingAutoClearDepthStencil(1, false)
 
     // Orthographic camera
     const camera = new ArcRotateCamera('cubeCamera', -Math.PI / 4, Math.PI / 3, 2.8, Vector3.Zero(), scene)
@@ -127,10 +129,8 @@ export default function ViewCube() {
       plane.metadata = { viewName: def.name }
     })
 
-    // ── 12 explicit edge lines — in group 0, vertices scaled 1.004 outward
-    // so they sit just outside the cube surface and win depth test without
-    // z-fighting. Back edges are hidden by the depth buffer naturally.
-    const h = 0.5 * 1.004  // slightly outside
+    // ── 12 explicit edge lines in group 1 (no z-fight) with depth preserved ─
+    const h = 0.5
     const corners: [number,number,number][] = [
       [-h,-h,-h],[h,-h,-h],[h,h,-h],[-h,h,-h],
       [-h,-h, h],[h,-h, h],[h,h, h],[-h,h, h],
@@ -140,14 +140,14 @@ export default function ViewCube() {
       [4,5],[5,6],[6,7],[7,4],
       [0,4],[1,5],[2,6],[3,7],
     ]
-    const ec = new Color4(0.15, 0.15, 0.20, 0.18)
+    const ec = new Color4(0.05, 0.05, 0.08, 0.18)
     edgePairs.forEach(([a, b], i) => {
       const ln = MeshBuilder.CreateLines(`edge_${i}`, {
         points: [new Vector3(...corners[a]), new Vector3(...corners[b])],
         colors: [ec, ec],
       }, scene)
       ln.isPickable = false
-      // group 0: depth buffer hides back edges, only visible edges show
+      ln.renderingGroupId = 1
     })
 
     // ── Axis lines: inside subtle, outside bold ───────────────────────────
