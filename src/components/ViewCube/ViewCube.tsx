@@ -167,6 +167,7 @@ export default function ViewCube() {
       plane.rotation = faceEuler(f.nx, f.ny, f.nz)
       const mat = new StandardMaterial(`fm_${f.view}`, scene)
       mat.emissiveTexture  = makeFaceTex(f.label, scene)
+      mat.emissiveColor    = new Color3(1, 1, 1)  // pass texture through unchanged
       mat.disableLighting  = true
       mat.backFaceCulling  = true
       plane.material = mat
