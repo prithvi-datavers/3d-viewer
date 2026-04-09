@@ -72,7 +72,7 @@ function makeFaceTex(label: string, scene: Scene): DynamicTexture {
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, 256, 256)
   ctx.fillStyle = '#000000'
-  ctx.font = `bold ${label.length >= 5 ? 42 : 54}px Arial, sans-serif`
+  ctx.font = `bold ${label.length >= 5 ? 34 : 46}px Arial, sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(label, 128, 128)
