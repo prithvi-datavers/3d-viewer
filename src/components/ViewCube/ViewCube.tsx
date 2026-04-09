@@ -143,8 +143,8 @@ export default function ViewCube() {
 
     // ── Light ─────────────────────────────────────────────────────────────────
     const hemi = new HemisphericLight('h', new Vector3(0, 0, 1), scene)
-    hemi.intensity = 1; hemi.diffuse = new Color3(1, 1, 1)
-    hemi.groundColor = new Color3(0.8, 0.8, 0.85)
+    hemi.intensity = 1.5; hemi.diffuse = new Color3(1, 1, 1)
+    hemi.groundColor = new Color3(1, 1, 1)  // fully white from all angles
 
     // ── Group 0: solid cube body ───────────────────────────────────────────────
     // Fills the interior so back face-planes are never visible through gaps.
@@ -164,13 +164,9 @@ export default function ViewCube() {
       plane.position = new Vector3(f.nx, f.ny, f.nz).scaleInPlace(0.501)
       plane.rotation = faceEuler(f.nx, f.ny, f.nz)
       const mat = new StandardMaterial(`fm_${f.view}`, scene)
-      const ft = makeFaceTex(f.label, scene)
-      mat.diffuseTexture   = ft
-      mat.diffuseColor     = new Color3(1, 1, 1)
-      mat.specularColor    = new Color3(0, 0, 0)
-      mat.emissiveColor    = new Color3(0, 0, 0)
-      mat.disableLighting  = true
-      mat.backFaceCulling  = false
+      mat.diffuseTexture  = makeFaceTex(f.label, scene)
+      mat.specularColor   = new Color3(0, 0, 0)
+      mat.backFaceCulling = false
       plane.material = mat
       plane.metadata = { viewName: f.view }
       plane.renderingGroupId = 0
