@@ -164,12 +164,13 @@ export default function ViewCube() {
       plane.position = new Vector3(f.nx, f.ny, f.nz).scaleInPlace(0.501)
       plane.rotation = faceEuler(f.nx, f.ny, f.nz)
       const mat = new StandardMaterial(`fm_${f.view}`, scene)
-      mat.diffuseColor     = new Color3(0, 0, 0)
-      mat.emissiveTexture  = makeFaceTex(f.label, scene)
-      mat.emissiveColor    = new Color3(1, 1, 1)
+      const ft = makeFaceTex(f.label, scene)
+      mat.diffuseTexture   = ft
+      mat.diffuseColor     = new Color3(1, 1, 1)
       mat.specularColor    = new Color3(0, 0, 0)
+      mat.emissiveColor    = new Color3(0, 0, 0)
       mat.disableLighting  = true
-      mat.backFaceCulling  = false  // solid body occludes inner face; show both sides
+      mat.backFaceCulling  = false
       plane.material = mat
       plane.metadata = { viewName: f.view }
       plane.renderingGroupId = 0
