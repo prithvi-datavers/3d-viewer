@@ -159,14 +159,14 @@ export default function ViewCube() {
       // Inside: origin → face (subtle, rendered through cube)
       const inner = MeshBuilder.CreateLines(`axIn_${ax.label}`, {
         points: [Vector3.Zero(), ax.inner],
-        colors: [new Color4(c.r, c.g, c.b, 0.30), new Color4(c.r, c.g, c.b, 0.55)],
+        colors: [new Color4(c.r, c.g, c.b, 0.10), new Color4(c.r, c.g, c.b, 0.22)],
       }, scene)
       inner.isPickable = false
       inner.renderingGroupId = 2
       // Outside: face → badge (bold)
       const outer = MeshBuilder.CreateLines(`axOut_${ax.label}`, {
         points: [ax.inner, ax.outer],
-        colors: [new Color4(c.r, c.g, c.b, 0.65), new Color4(c.r, c.g, c.b, 1.0)],
+        colors: [new Color4(c.r, c.g, c.b, 0.75), new Color4(c.r, c.g, c.b, 1.0)],
       }, scene)
       outer.isPickable = false
       outer.renderingGroupId = 2
