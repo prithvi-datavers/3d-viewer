@@ -9,13 +9,14 @@ import { animateToView, VIEWS } from '../../lib/babylon/CameraManager'
 import type { ViewPreset } from '../../types/viewer'
 
 // Face planes at ±0.501 — just outside the solid cube body (0.001 sub-pixel offset)
+// LEFT/RIGHT use Y-axis rotation so the plane lies in YZ world space (not XY horizontal)
 const FACE_DEFS = [
-  { name: 'FRONT',  pos: [0, -0.501, 0]  as [number,number,number], rot: [ Math.PI/2, 0, 0]       as [number,number,number] },
-  { name: 'BACK',   pos: [0,  0.501, 0]  as [number,number,number], rot: [-Math.PI/2, 0, Math.PI] as [number,number,number] },
-  { name: 'RIGHT',  pos: [0.501,  0, 0]  as [number,number,number], rot: [0, 0, -Math.PI/2]       as [number,number,number] },
-  { name: 'LEFT',   pos: [-0.501, 0, 0]  as [number,number,number], rot: [0, 0,  Math.PI/2]       as [number,number,number] },
-  { name: 'TOP',    pos: [0, 0,  0.501]  as [number,number,number], rot: [0, 0, 0]                as [number,number,number] },
-  { name: 'BOTTOM', pos: [0, 0, -0.501]  as [number,number,number], rot: [Math.PI, 0, 0]          as [number,number,number] },
+  { name: 'FRONT',  pos: [0, -0.501, 0]  as [number,number,number], rot: [ Math.PI/2, 0, 0]                   as [number,number,number] },
+  { name: 'BACK',   pos: [0,  0.501, 0]  as [number,number,number], rot: [-Math.PI/2, 0, Math.PI]             as [number,number,number] },
+  { name: 'RIGHT',  pos: [0.501,  0, 0]  as [number,number,number], rot: [0,  Math.PI/2,  Math.PI/2]          as [number,number,number] },
+  { name: 'LEFT',   pos: [-0.501, 0, 0]  as [number,number,number], rot: [0, -Math.PI/2, -Math.PI/2]          as [number,number,number] },
+  { name: 'TOP',    pos: [0, 0,  0.501]  as [number,number,number], rot: [0, 0, 0]                            as [number,number,number] },
+  { name: 'BOTTOM', pos: [0, 0, -0.501]  as [number,number,number], rot: [Math.PI, 0, 0]                      as [number,number,number] },
 ]
 
 const FACE_LABELS: Record<string, string> = {
@@ -116,7 +117,7 @@ export default function ViewCube() {
 
     // ── Face planes at ±0.501 (0.001 above cube surface, sub-pixel) ───────
     FACE_DEFS.forEach((def) => {
-      const plane = MeshBuilder.CreatePlane(`face_${def.name}`, { size: 0.98 }, scene)
+      const plane = MeshBuilder.CreatePlane(`face_${def.name}`, { size: 1.0 }, scene)
       plane.position = new Vector3(...def.pos)
       plane.rotation = new Vector3(...def.rot)
       const mat = new StandardMaterial(`faceMat_${def.name}`, scene)
