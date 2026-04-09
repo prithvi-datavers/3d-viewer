@@ -5,7 +5,6 @@ import { initScene } from '../../lib/babylon/SceneManager'
 import { loadFile, loadSampleGeometry } from '../../lib/babylon/ModelLoader'
 import { applyShadingMode, getModelMeshes } from '../../lib/babylon/ShadingManager'
 import { fitToScene } from '../../lib/babylon/CameraManager'
-import ViewCube from '../ViewCube/ViewCube'
 import MeasurementLabels from './MeasurementLabels'
 import ShadingController from './controllers/ShadingController'
 import SelectionController from './controllers/SelectionController'
@@ -176,7 +175,6 @@ export default function Viewer3D({ activePanel, onPanelSelect }: Props) {
       {/* Overlays */}
       <TopToolbar />
       <MeasurementLabels />
-      <ViewCube />
       <StatusBar loadedFileName={loadedFileName} />
 
       {isDragging && (

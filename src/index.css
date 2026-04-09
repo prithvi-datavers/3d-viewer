@@ -448,25 +448,6 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ViewCube (top-right)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.viewcube-widget {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 10;
-  background: transparent;
-  border: none;
-  padding: 0;
-  pointer-events: auto;
-}
-.viewcube-canvas-wrap {
-  width: 112px;
-  height: 112px;
-  border-radius: 6px;
-  overflow: hidden;
-}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    Status Bar
